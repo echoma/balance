@@ -1,0 +1,13 @@
+{
+  "name": "test",
+  "version": "1.0.0",
+  "description": "Node.js on Docker",
+  "author": "fatmck@163.com",
+  "main": "01_test.js",
+  "scripts": {
+    "start": "node 01_test.js"
+  },
+  "dependencies": {
+    "blessed": "^0.1.81"
+  }
+}
