@@ -1,11 +1,17 @@
+const blessed = require('blessed');
+const UIComp = require('./ui_comp')
+
 // The base class of all tool dialogs.
-class ToolDlg {
+class ToolDlg extends UIComp {
 
     // Several tool categories, 
     static get CATEGORY_HELPER() { return 'helper' }
 
     // Register a dialog class by name
-    static registerDialogClass(className, cls) { ToolDlg.nameRegister.set(className, cls); }
+    static registerDialogClass(className, cls) {
+        if (!ToolDlg.nameRegister.has(className))
+            ToolDlg.nameRegister.set(className, cls);
+    }
     // Find dialog class by name in the register
     static findDialogClassByName(className) {
         if (ToolDlg.nameRegister.has(className))
@@ -20,47 +26,37 @@ class ToolDlg {
         }
         return null;
     }
+    // load and register all built-in dialog class
+    static loadAllBuiltIn() {
+        require ('require-all')({
+            dirname: __dirname,
+            filter: /.+_dlg\.js$/,
+            recursive: true
+        });
+    }
 
     // The contructor
     constructor(id) {
+        super();
         // Each tool dialog instance has an unique id.
         this.id = parseInt(id);
         if (!Number.isInteger(this.id) 
             || this.id<=0 
             || this.id>99999999)
-            throw `ToolDlg.id should be in [1,99999999], but '${id}' is given`;
-        // Set several properties of this dialog
-        this.prop = new Map();
-        // The UI component (UI)
+            throw new Error(`ToolDlg.id should be in [1,99999999], but '${id}' is given`);
+        // The main UI component
         this.ui = this.createUI();
+        // Bind escape key for close action
+        this.ui.key(['escape'], (ch, key)=>{
+            const LayoutMng = require('../layout/layout_mng');
+            LayoutMng.singleton.remove(this);
+        });
     }
 
     // Get the category of this tool dialog class.
     static get category() { return ToolDlg.CATEGORY_HELPER; }
     // Get the default title of this dialog class.
     static get defaultTitle() { return 'Tool'; }
-
-    // Create the UI instance
-    createUI() {
-        let blessed = require('blessed');
-        return blessed.box({
-            left: 'center', height: 'center',
-            width: 20, height: 10,
-            label: this.title,
-            content: this.title,
-            border:'line', draggable: true,
-            style: this.UIStyle
-        });
-    }
-
-    // Get UI style settings of the specified dialog.
-    get UIStyle() {
-        return {
-            fg: 'white', bg: 'magenta',
-            border: { fg: '#f0f0f0' },
-            hover: { bg: 'green' }
-        };
-    }
 
     // Set dialog title
     set title(t) { this.prop.set('title', t.toString()); }
@@ -73,13 +69,36 @@ class ToolDlg {
         }
         return this.prop.get('title');
     }
+
+    /**
+     * Create the UI instance.
+     * Each dialog class should have its own implementation of this method
+     */
+    createUI() {
+        return this.CreateWindow(this.title, {
+            width: 20, height: 10,
+        });
+    }
+
+    // Generate Layout Data for save to file
+    generateLayoutData() {
+        // This class is base class, can be called with this method.
+        return {
+            id: this.id,
+            className: this.constructor.name,
+            prop: [...this.prop],
+            layout: {
+                width: this.ui.width,
+                height: this.ui.height,
+                left: this.ui.left,
+                top: this.ui.top,
+            }
+        };
+    }
 }
 
 // The global dialog class register, this maintains a map from class name to class.
 ToolDlg.nameRegister = new Map();
 ToolDlg.registerDialogClass('ToolDlg', ToolDlg);
 
-module.exports = {
-    name: 'ToolDlg',
-    ToolDlg: ToolDlg
-};
+module.exports = ToolDlg;

@@ -8,6 +8,7 @@
     "start": "node 01_test.js"
   },
   "dependencies": {
-    "blessed": "^0.1.81"
+    "blessed": "^0.1.81",
+    "require-all": "^2.2.0"
   }
 }

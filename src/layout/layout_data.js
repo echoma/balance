@@ -2,7 +2,20 @@
 class LayoutData {
     constructor(name='Unnamed Layout') {
         this.name = name;
-        this.dlg_list = [];
+        this.dlgDataList = [];
+    }
+
+    serialize() {
+        let list = [];
+        this.dlgDataList.forEach((layoutDlgData)=>{
+            list.push({
+                id:layoutDlgData.id,
+                className:layoutDlgData.className,
+                prop:layoutDlgData.prop,
+                layout:layoutDlgData.layout
+            });
+        });
+        return JSON.stringify(list);
     }
 }
 
@@ -23,20 +36,7 @@ class LayoutDlgData {
     }
 }
 
-const defaultLayoutData = new LayoutData('Default Layout');
-function initDefaultLayout()
-{
-    const {ToolDlg} = require('../tools/tool_dlg');
-    let {name} = require('../tools/helper/global_mng_dlg');
-    let cls = ToolDlg.findDialogClassByName(name)
-    var gmd = new LayoutDlgData(1, name, {}, {})
-    gmd.prop.title = cls.defaultTitle;
-    defaultLayoutData.dlg_list.push(gmd);
-}
-initDefaultLayout();
-
 module.exports = {
     LayoutData: LayoutData,
-    LayoutDlgData: LayoutDlgData,
-    defaultLayoutData: defaultLayoutData
+    LayoutDlgData: LayoutDlgData
 };
