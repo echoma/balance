@@ -35,21 +35,41 @@ class ToolDlg extends UIComp {
         });
     }
 
-    // The contructor
-    constructor(id) {
+    /**
+     * The contructor.
+     * @param {int} id an integer unique id of this dialog.
+     * @param {JsonObject} attr attributes to define the behivior.
+     */
+    constructor(id, prop={}, layout={}) {
         super();
-        // Each tool dialog instance has an unique id.
-        this.id = parseInt(id);
-        if (!Number.isInteger(this.id) 
-            || this.id<=0 
-            || this.id>99999999)
+        // id
+        checkParam(id, 'int', 'ToolDlg.id');
+        if (this.id<=0 || this.id>99999999)
             throw new Error(`ToolDlg.id should be in [1,99999999], but '${id}' is given`);
-        // The main UI component
-        this.ui = this.createUI();
-        // Bind escape key for close action
+        this.id = parseInt(id);
+        // prop
+        checkParam(prop, 'jsonobj', 'ToolDlg.prop');
+        let final_prop = Object.assign({
+            title: '', // title of this dialog. undefined or empty string means using class defined default title.
+            onEscapeKey: 'close', // action when escape key pressed. 'close' is default, 'hide' for hidden.
+        }, prop);
+        this.prop = json2map(final_prop);
+        // create main UI component
+        checkParam(layout, 'jsonobj', 'ToolDlg.layout');
+        let fianl_layout = Object.assign({
+            left: 'center',
+            top: 'center'
+        }, layout);
+        this.ui = this.createUI(fianl_layout);
+        // bind escape key for close action
         this.ui.key(['escape'], (ch, key)=>{
-            const LayoutMng = require('../layout/layout_mng');
-            LayoutMng.singleton.remove(this);
+            let action = this.prop.get('onEscapeKey');
+            if (action=='close') {
+                const LayoutMng = require('../layout/layout_mng');
+                LayoutMng.singleton.remove(this);
+            } else if (action=='hide') {
+                this.ui.hide();
+            }
         });
     }
 
@@ -62,22 +82,23 @@ class ToolDlg extends UIComp {
     set title(t) { this.prop.set('title', t.toString()); }
     // Get dialog title
     get title() {
-        if (!this.prop.has('title'))
-        {
-            let cls = ToolDlg.findDialogClassByName(this.constructor.name);
-            return cls.defaultTitle;
+        if (this.prop.has('title')) {
+            if (this.prop.get('title').length>0)
+                return this.prop.get('title')+` #${this.id}`;
         }
-        return this.prop.get('title');
+        let cls = ToolDlg.findDialogClassByName(this.constructor.name);
+        return cls.defaultTitle+` #${this.id}`;
     }
 
     /**
      * Create the UI instance.
      * Each dialog class should have its own implementation of this method
      */
-    createUI() {
-        return this.CreateWindow(this.title, {
+    createUI(layout) {
+        let attr = Object.assign({
             width: 20, height: 10,
-        });
+        }, layout);
+        return this.CreateWindow(this.title, attr);
     }
 
     // Generate Layout Data for save to file
@@ -86,12 +107,13 @@ class ToolDlg extends UIComp {
         return {
             id: this.id,
             className: this.constructor.name,
-            prop: [...this.prop],
+            prop: map2json(this.prop),
             layout: {
                 width: this.ui.width,
                 height: this.ui.height,
                 left: this.ui.left,
                 top: this.ui.top,
+                hidden: this.ui.hidden,
             }
         };
     }

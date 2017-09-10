@@ -9,6 +9,8 @@
   },
   "dependencies": {
     "blessed": "^0.1.81",
+    "expand-tilde": "^2.0.2",
+    "minimist": "^1.2.0",
     "require-all": "^2.2.0"
   }
 }

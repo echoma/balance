@@ -54,13 +54,39 @@ class UIComp {
             bg: 'blue'
         }
     }
-    // Get the UI Style of message
+    // Get the UI Style of message text
     static get UIStyleMsg() {
         return {
             fg: 'red',
             bg: 'green',
             border: { fg: 'white' },
         }
+    }
+    // Get the UI Style of error text
+    static get UIStyleError() {
+        return {
+            fg: 'green',
+            bg: 'red',
+            border: { fg: 'white' },
+        }
+    }
+    // Get the UI style of radio in this dialog
+    get UIStyleRadio() {
+        return {
+            fg: 'black', bg: 'blue',
+            border: { fg: 'white' },
+            focus: { fg: 'white', bg: 'red' },
+        }
+    }
+    // Get the UI style of radio-set in this dialog
+    get UIStyleRadioSet() {
+        return {
+            fg: 'white', bg: 'blue',
+            border: { fg: 'white', bg: 'blue' }
+        }
+    }
+    UiStyleRadioSetTitle(title) {
+        return `{black-fg,blue-bg}${title}{/black-fg,blue-bg}`
     }
 
     /**
@@ -76,7 +102,7 @@ class UIComp {
             draggable: true, 
             style: this.UIStyleWindow
         }, attr);
-        return blessed.box(final_attr);
+        return blessed.form(final_attr);
     }
 
     /**
@@ -88,7 +114,7 @@ class UIComp {
         let final_attr = Object.assign({
             content: txt, align: 'center',
             mouse: true, keys: true,
-            shrink: true, 
+            shrink: true, name: txt.toLowerCase(),
             padding: {left:1, right:1},
             style: this.UIStyleBtn
         }, attr);
@@ -102,7 +128,7 @@ class UIComp {
 
     createInput(txt, attr={}) {
         let final_attr = Object.assign({
-            content: txt, mouse: true,
+            value: txt, mouse: true,
             keys: true, vi: true,
             inputOnFocus: true,
             style: this.UIStyleInput
@@ -116,8 +142,7 @@ class UIComp {
      */
     createStaticText(txt, attr={}) {
         let final_attr = Object.assign({
-            content: txt,
-            align: 'left',
+            content: txt, shrink:true,
             style: this.UIStyleStaticText
         }, attr);
         return blessed.text(final_attr);
@@ -140,6 +165,41 @@ class UIComp {
             msgbox.destroy();
         })
         return msgbox;
+    }
+    static showError(txt, time=3, attr={}) {
+        const LayoutMng = require('../layout/layout_mng');
+        let final_attr = Object.assign({
+            left: 'center', top: 3,
+            shrink: true, border: 'line',
+            padding: {left:2, right:2},
+            style: UIComp.UIStyleError,
+            parent: LayoutMng.singleton.uiParent
+        }, attr);
+        let msgbox = new blessed.message(final_attr);
+        msgbox.display(txt, time, ()=>{
+            msgbox.destroy();
+        })
+        return msgbox;
+    }
+
+    createRadio(txt, attr={}) {
+        let final_attr = Object.assign({
+            content: txt, align: 'center',
+            mouse: true, keys: true,
+            shrink: true, 
+            padding: {left:1, right:1},
+            style: this.UIStyleRadio
+        }, attr);
+        return blessed.radiobutton(final_attr);
+    }
+    createRadioSet(title, attr={}) {
+        let final_attr = Object.assign({
+            label: this.UiStyleRadioSetTitle(title), border:'line',
+            keys: true, mouse: true,
+            shrink: true, tags: true,
+            style: this.UIStyleRadioSet
+        }, attr);
+        return blessed.radioset(final_attr);
     }
 }
 

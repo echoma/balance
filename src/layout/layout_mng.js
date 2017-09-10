@@ -30,13 +30,26 @@ class LayoutMng {
      * @param {String} layoutFilePath the layout data file path name. Empty string means using the default layout.
      */
     init(layoutFilePath = '') {
-        if ('string'!=typeof(layoutFilePath))
-            throw new Error(`a string should be given as layoutFilePath, but a '${typeof(layoutFilePath)}' is given.`);
-        let layoutData = this.loadDefaultLayoutData();
+        // load dialog classes
+        ToolDlg.loadAllBuiltIn();
+        // load data
+        checkParam(layoutFilePath, 'string', 'layoutFilePath');
+        let layoutData = null;
+        if (layoutFilePath.length<=0) {
+            layoutData = this.loadDefaultLayoutData();
+        } else {
+            let expandTilde = require('expand-tilde');
+            let text_buf = require('fs').readFileSync(expandTilde(layoutFilePath));
+            let text = text_buf.toString();
+            layoutData = LayoutData.parse(text);
+            this.checkLayoutData(layoutData);
+        }
+        // clear all dialogs
         this.clear();
+        // init
         for (let layoutDlgData of layoutData.dlgDataList) {
             let cls = ToolDlg.findDialogClassByName(layoutDlgData.className);
-            let dlg = new cls(layoutDlgData.id);
+            let dlg = new cls(layoutDlgData.id, layoutDlgData.prop, layoutDlgData.layout);
             dlg.appendTo(this.uiParent);
             this.dlgList.push(dlg);
         }
@@ -44,16 +57,24 @@ class LayoutMng {
         this.layoutFilePath = layoutFilePath;
     }
 
+    /**
+     * Save current dialog layout to local file.
+     * @param {String} layoutFilePath the file name path where to save the layout.
+     */
     save(layoutFilePath = '') {
-        if ('string'!=typeof(layoutFilePath))
-            throw new Error(`a string should be given as layoutFilePath, but a '${typeof(layoutFilePath)}' is given.`);
+        checkParam(layoutFilePath, 'string', 'layoutFilePath');
         if (layoutFilePath.length<=0)
             throw new Error('empty string given for layoutFilePath');
+        let expandTilde = require('expand-tilde');
         let layoutData = this.generateLayoutData();
-        let content = layoutData.serialize();
-        require('fs').writeFile(layoutFilePath, content, (err)=>{
-            ToolDlg.showMsg(err?'Failed!':'Success!');
-            if (err) bilog(err);
+        let content = LayoutData.serialize(layoutData);
+        require('fs').writeFile(expandTilde(layoutFilePath), content, (err)=>{
+            if (err) {
+                bilog(err);
+                ToolDlg.showError(`Failed!\n${err.message}`);
+            } else {
+               ToolDlg.showMsg('Success!');
+            }
         });
     }
 
@@ -83,14 +104,34 @@ class LayoutMng {
         this.screen.render();
     }
 
+    // Add new dialog
+    add(cls) {
+        let id_set = new Set();
+        for (let idx in this.dlgList) {
+            id_set.add(this.dlgList[idx].id);
+        }
+        let new_id = 0;
+        for (let i=1; i<999999; ++i) {
+            if (!id_set.has(i)) {
+                new_id = i;
+                break;
+            }
+        }
+        if (0==new_id) {
+            throw new Error('Can not decide the id of new dialog');
+        }
+        let dlg = new cls(new_id);
+        dlg.appendTo(this.uiParent);
+        this.dlgList.push(dlg);
+        this.screen.render();
+    }
+
     // Load default layout data and return it
     loadDefaultLayoutData() {
         // if default layout data not exists, create it.
         if (null==LayoutMng.defaultLayoutData)
         {
             LayoutMng.defaultLayoutData = new LayoutData('Default Layout');
-            const ToolDlg = require('../tools/tool_dlg');
-            ToolDlg.loadAllBuiltIn();
             // add a global manager dialog
             let clsName = 'GlobalMngDlg';
             let cls = ToolDlg.findDialogClassByName(clsName);
@@ -99,6 +140,27 @@ class LayoutMng {
             LayoutMng.defaultLayoutData.dlgDataList.push(layoutDlgData);
         }
         return LayoutMng.defaultLayoutData;
+    }
+
+    // Check the specified layout data, make sure it has the basic dialogs.
+    checkLayoutData(layoutData) {
+        // check
+        let hasGlobalMng = false;
+        for (let idx in layoutData.dlgDataList) {
+            if ('GlobalMngDlg'==layoutData.dlgDataList[idx].className) {
+                hasGlobalMng = true;
+                break;
+            }
+        }
+        if (hasGlobalMng)
+            return;
+        bwlog('GlobalMngDlg is missing in the specified layout data, inserting new one.');
+        // make sure
+        let clsName = 'GlobalMngDlg';
+        let cls = ToolDlg.findDialogClassByName(clsName);
+        let layoutDlgData = new LayoutDlgData(1, clsName, {}, {})
+        layoutDlgData.prop.title = cls.defaultTitle;
+        layoutData.dlgDataList.push(layoutDlgData);
     }
 
     // Generate layout data for current dialogs

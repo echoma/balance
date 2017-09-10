@@ -1,21 +1,41 @@
 // The data layer of layout
 class LayoutData {
-    constructor(name='Unnamed Layout') {
-        this.name = name;
-        this.dlgDataList = [];
+
+    constructor(name='Unnamed Layout',
+                savedTime=new Date(),
+                dlgDataList=[]) {
+        checkParam(name, 'string', 'LayoutData.name');
+        let trimed_name = name.trim();
+        if (trimed_name.length<=0)
+            throw new Error(`an empty string is given as name`);
+        this.name = trimed_name;
+        this.savedTime = savedTime;
+        checkParam(dlgDataList, 'array', 'LayoutData.dlgDataList');
+        this.dlgDataList = dlgDataList;
     }
 
-    serialize() {
-        let list = [];
-        this.dlgDataList.forEach((layoutDlgData)=>{
-            list.push({
+    static serialize(layoutData) {
+        let data = {
+            name: layoutData.name,
+            savedTime: (new Date()).toString(),
+            list: []
+        };
+        layoutData.dlgDataList.forEach((layoutDlgData)=>{
+            data.list.push({
                 id:layoutDlgData.id,
                 className:layoutDlgData.className,
                 prop:layoutDlgData.prop,
                 layout:layoutDlgData.layout
             });
         });
-        return JSON.stringify(list);
+        return JSON.stringify(data);
+    }
+
+    static parse(text) {
+        let data = JSON.parse(text);
+        return new LayoutData(data.name, 
+            new Date(data.savedTime),
+            data.list);
     }
 }
 

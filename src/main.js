@@ -1,31 +1,35 @@
-//global log functions
-function getLogCaller()
-{
-  var e = new Error();
-	var lines=e.stack.split('\n');
-	return lines[3];
+let argv = require('minimist')(process.argv.slice(2));
+
+if (argv.h) {
+    let help = `Help:
+    -h: print help infomation.
+    -l: load this layout data file. Default layout will be used if not speicified.
+    -d: debug log file path name.
+
+Shortcuts:
+    Ctrl-g: show the 'Global Management Dialog'.
+    `;
+    console.log(help);
+    process.exit(0);
 }
-global.bilog=function() {
-  var args = Array.prototype.slice.call(arguments);
-  args.push(getLogCaller()+'\n');
-  require('fs').appendFileSync('./test.log', args.join(' '));
-}
+
+require('./global_func');
 
 // initialize UI
 const blessed = require('blessed');
 let screen = blessed.screen({
-  tput: true,
-  smartCSR: true,
-  autoPadding: true,
+    tput: true,
+    smartCSR: true,
+    autoPadding: true,
 });
-let box = blessed.box({parent:screen, widht:'100%', height:'100%'});
 const LayoutMng = require('./layout/layout_mng');
-let layoutMng = new LayoutMng(screen, box);
+let layoutMng = new LayoutMng(screen, screen);
 
-layoutMng.init();
+let layoutDataFile = argv.l? argv.l : '';
+layoutMng.init(layoutDataFile);
 
 // bind Ctrl-C for quit action
 screen.key(['C-c'], function(ch, key) {
     screen.destroy();
     return process.exit(0);
-  });
+});
