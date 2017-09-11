@@ -64,6 +64,7 @@ class ToolDlg extends UIComp {
         // bind escape key for close action
         this.ui.key(['escape'], (ch, key)=>{
             let action = this.prop.get('onEscapeKey');
+            bilog(`action=${action}`);
             if (action=='close') {
                 const LayoutMng = require('../layout/layout_mng');
                 LayoutMng.singleton.remove(this);
@@ -84,10 +85,10 @@ class ToolDlg extends UIComp {
     get title() {
         if (this.prop.has('title')) {
             if (this.prop.get('title').length>0)
-                return this.prop.get('title')+` #${this.id}`;
+                return `#${this.id} `+this.prop.get('title');
         }
         let cls = ToolDlg.findDialogClassByName(this.constructor.name);
-        return cls.defaultTitle+` #${this.id}`;
+        return `#${this.id} `+cls.defaultTitle;
     }
 
     /**
@@ -98,7 +99,7 @@ class ToolDlg extends UIComp {
         let attr = Object.assign({
             width: 20, height: 10,
         }, layout);
-        return this.CreateWindow(this.title, attr);
+        return this.CreateFormWindow(this.title, attr);
     }
 
     // Generate Layout Data for save to file

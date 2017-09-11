@@ -22,23 +22,24 @@ class GlobalMngDlg extends ToolDlg {
 
     // Create the UI instance
     createUI(layout) {
-        const blessed = require('blessed');
         // main dialog
         let attr = Object.assign(layout, {
             width: 26, height: 10,
         });
-        let dlg = this.createWindow(this.title, attr);
+        let dlg = this.createFormWindow(this.title, attr);
+        let form = dlg.insideForm;
+        this._ = new Object();
         // button: save layout
-        this.uiWidgets.btn_save_layout = this.createBtn('Save layout', {
-            parent: dlg, 
+        this._.btn_save_layout = this.createBtn('Save layout', {
+            parent: form, 
             left:2, top:1,
         });
-        this.uiWidgets.btn_save_layout.on('press', ()=>{
-            this.uiWidgets.prompt_save_layout.prompt(
+        this._.btn_save_layout.on('press', ()=>{
+            this._.prompt_save_layout.prompt(
                 'File path-name in which you wanna save it.',
                 LayoutMng.singleton.layoutFilePath, 
                 (ok, val)=>{
-                    setTimeout(()=>{this.uiWidgets.btn_save_layout.focus();},50);
+                    setTimeout(()=>{this._.btn_save_layout.focus();},50);
                     if (ok)
                     {
                         if (val.length<=0)
@@ -51,16 +52,16 @@ class GlobalMngDlg extends ToolDlg {
                 });
         });
         // prompt: where to save
-        this.uiWidgets.prompt_save_layout = this.createPrompt(
+        this._.prompt_save_layout = this.createPrompt(
             LayoutMng.singleton.uiParent,
             'Save Layout'
         );
         // button: show order act dialog
-        this.uiWidgets.btn_order_act = this.createBtn('Order Input', {
-            parent: dlg, 
+        this._.btn_order_act = this.createBtn('Order Input', {
+            parent: form, 
             left:2, top:3,
         });
-        this.uiWidgets.btn_order_act.on('press', ()=>{
+        this._.btn_order_act.on('press', ()=>{
             let cls = ToolDlg.findDialogClassByName('OrderActDlg');
             LayoutMng.singleton.add(cls);
         });

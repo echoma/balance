@@ -13,53 +13,54 @@ class BalPrompt extends UIComp {
     }
 
     createUI() {
-        let win = this.createWindow(this.prop.get('title'), {
+        let dlg = this.createWindow(this.prop.get('title'), {
             width: 'half', height: 9,
             hidden: true
         });
-        this.uiWidgets.input = this.createInput('', {
-            parent: win,
+        this._ = new Object();
+        this._.input = this.createInput('', {
+            parent: dlg,
             left: 2, right: 2, 
             top: 3, height: 1
         });
-        this.uiWidgets.input.on('submit', (val)=>{
+        this._.input.on('submit', (val)=>{
             this.done(true, val);
         });
-        this.uiWidgets.question = this.createStaticText('', {
-            parent: win,
+        this._.question = this.createStaticText('', {
+            parent: dlg,
             left: 2, right: 2, top:1, height: 1
         });
-        this.uiWidgets.okay = this.createBtn('Okay', {
-            parent: win, 
+        this._.okay = this.createBtn('Okay', {
+            parent: dlg, 
             right: 14, top: 5, 
             width: 6, height: 1,
         });
-        this.uiWidgets.okay.on('press', ()=>{
-            this.done(true, this.uiWidgets.input.getContent());
+        this._.okay.on('press', ()=>{
+            this.done(true, this._.input.getContent());
         });
-        this.uiWidgets.cancel = this.createBtn('Cancel', {
-            parent: win, 
+        this._.cancel = this.createBtn('Cancel', {
+            parent: dlg, 
             right: 2, top: 5, 
             width: 8, height: 1,
         });
-        this.uiWidgets.cancel.on('press', ()=>{
+        this._.cancel.on('press', ()=>{
             this.done(false, null);
         });
-        return win;
+        return dlg;
     }
 
     prompt(question, initialValue, callback) {
-        this.uiWidgets.question.setContent(question);
-        this.uiWidgets.input.setValue(initialValue);
-        this.uiWidgets.input.focus();
-        this.uiWidgets.callback = callback;
+        this._.question.setContent(question);
+        this._.input.setValue(initialValue);
+        this._.input.focus();
+        this._.callback = callback;
         this.ui.setFront();
         this.ui.show();
         LayoutMng.singleton.screen.render();
     }
 
     done(ok, val) {
-        this.uiWidgets.callback(ok, val);
+        this._.callback(ok, val);
         this.ui.hide();
         LayoutMng.singleton.screen.render();
     }
