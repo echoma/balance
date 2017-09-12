@@ -3,19 +3,24 @@
  *      bilog: level info
  *      bwlog: level warning
  */
+const winston = require('winston');
 
 // register our own log function
 global.bilog=function(){
     var args = Array.prototype.slice.call(arguments);
-    args.unshift('[INFO] ')
-    args.push(' #'+getLogCaller()+'\n');
-    require('fs').appendFileSync(log_path_name, args.join(''));
+    //args.unshift('[INFO] ')
+    //args.push(' #'+getLogCaller()+'\n');
+    //require('fs').appendFileSync(log_path_name, args.join(''));
+    args.push(' #'+getLogCaller());
+    logger.info(args.join(''))
 }
 global.bwlog=function(){
     var args = Array.prototype.slice.call(arguments);
-    args.unshift('[WARN] ')
-    args.push(' #'+getLogCaller()+'\n');
-    require('fs').appendFileSync(log_path_name, args.join(''));
+    //args.unshift('[WARN] ')
+    //args.push(' #'+getLogCaller()+'\n');
+    //require('fs').appendFileSync(log_path_name, args.join(''));
+    args.push(' #'+getLogCaller());
+    logger.warn(args.join(''))
 }
 // get the caller infomation. it's used in bilog.
 function getLogCaller()
@@ -25,8 +30,30 @@ function getLogCaller()
     return lines[3].trim();
 }
 
-let argv = require('minimist')(process.argv.slice(2));
-let log_path_name = argv.d? argv.d : './test.log';
+const argv = require('minimist')(process.argv.slice(2));
+const logger = new (winston.Logger)({
+    transports: [
+        new (winston.transports.File)({
+            filename: argv.d? argv.d : '/dev/null',
+            maxsize: 100*1024,
+            maxFiles: 1,
+            handleExceptions: true,
+            humanReadableUnhandledException: true,
+            json: false,
+            formatter: function(options){
+                let date = new Date();
+                let txt = `[${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}][${options.level}]: ${options.message ? options.message : ''}`;
+                if (options.meta && options.meta.stack && Array.isArray(options.meta.stack)) {
+                    options.meta.stack.forEach((s)=>{
+                        txt += '\n  '+s;
+                    });
+                }
+                return txt;
+            }
+        })
+    ]
+});
+logger.exitOnError = false;
 bilog(`
 **************************
 *       BLANCE 0.1       *

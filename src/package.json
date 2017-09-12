@@ -1,16 +1,14 @@
 {
-  "name": "test",
+  "name": "balance",
   "version": "1.0.0",
-  "description": "Node.js on Docker",
+  "description": "a command line frontend for security trading",
   "author": "fatmck@163.com",
-  "main": "01_test.js",
-  "scripts": {
-    "start": "node 01_test.js"
-  },
+  "main": "main.js",
   "dependencies": {
     "blessed": "^0.1.81",
     "expand-tilde": "^2.0.2",
     "minimist": "^1.2.0",
-    "require-all": "^2.2.0"
+    "require-all": "^2.2.0",
+    "winston": "^2.3.1"
   }
 }

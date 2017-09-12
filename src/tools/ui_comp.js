@@ -182,8 +182,8 @@ class UIComp {
 
     createInput(txt, attr={}) {
         let finalAttr = Object.assign({
-            value: txt, mouse: true,
-            keys: true, vi: true,
+            value: txt,// mouse: true,
+            keys: true,// vi: true,
             inputOnFocus: true,
             style: this.UIStyleInput
         }, attr);
@@ -316,7 +316,7 @@ class UIComp {
             border: 'line',
             style: this.UIStyleSelectList,
         }, listAttr, {
-            parent: LayoutMng.singleton.screen
+            parent: LayoutMng.singleton.uiParent
         });
         btn.popupList = blessed.list(finalListAttr);
         btn.popupList.select(defaultIdx);

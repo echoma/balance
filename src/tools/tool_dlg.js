@@ -64,7 +64,6 @@ class ToolDlg extends UIComp {
         // bind escape key for close action
         this.ui.key(['escape'], (ch, key)=>{
             let action = this.prop.get('onEscapeKey');
-            bilog(`action=${action}`);
             if (action=='close') {
                 const LayoutMng = require('../layout/layout_mng');
                 LayoutMng.singleton.remove(this);
