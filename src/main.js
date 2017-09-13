@@ -7,7 +7,7 @@ if (argv.h) {
     -d: debug log file path name.
 
 Shortcuts:
-    Ctrl-g: show the 'Global Management Dialog'.
+    Ctrl+g: bring the 'Global Management Dialog' to front.
     `;
     console.log(help);
     process.exit(0);
