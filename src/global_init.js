@@ -1,3 +1,25 @@
+const argv = require('minimist')(process.argv.slice(2));
+global.argv_array=function(){
+    return argv;
+}
+
+if (argv.h) {
+    let help = `
+Balance is a security trading frontend.
+
+Options:
+    -h: print help infomation.
+    -l: load this layout data file. Default layout will be used if not speicified.
+    -d: debug log file path name.
+    -s: backend RPC server host, default is localhost:9527.
+
+Shortcuts:
+    Ctrl+g: bring the 'Global Management Dialog' to front.
+    `;
+    console.log(help);
+    process.exit(0);
+}
+
 /**
  * our own log function: 
  *      bilog: level info
@@ -30,7 +52,6 @@ function getLogCaller()
     return lines[3].trim();
 }
 
-const argv = require('minimist')(process.argv.slice(2));
 const logger = new (winston.Logger)({
     transports: [
         new (winston.transports.File)({
@@ -125,13 +146,26 @@ global.checkParam=(param, type, name='')=>{
         );
     }
 }
-function isEmpty(param)
+global.isEmpty=function(param)
 {
-    for (let n in param) {
-        if (param.hasOwnProperty(n))
-            return false;
+    if (null==param)
+        return true;
+    if ('undefined'==typeof(param))
+        return true;
+    if (Number.isInteger(param) && (0==param || Number.isNaN(param)))
+        return true;
+    if (Array.isArray(param) && 0==param.length)
+        return true;
+    if ('string'==typeof(param) && 0==param.length)
+        return true;
+    if ('object'==typeof(param)) {
+        for (let n in param) {
+            if (param.hasOwnProperty(n))
+                return false;
+        }
+        return true;
     }
-    return true;
+    return false;
 }
 
 //checkParam(0, '+int', 'Qty');
@@ -160,3 +194,5 @@ global.map2json=function(mapobj) {
     }
     return j;
 }
+
+module.exports = argv;

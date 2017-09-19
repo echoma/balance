@@ -4,9 +4,15 @@
   "description": "a command line frontend for security trading",
   "author": "fatmck@163.com",
   "main": "main.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/echoma/balance.git"
+  },
+  "license": "Apache License 2.0",
   "dependencies": {
     "blessed": "^0.1.81",
     "expand-tilde": "^2.0.2",
+    "grpc": "^1.6.0",
     "minimist": "^1.2.0",
     "require-all": "^2.2.0",
     "winston": "^2.3.1"

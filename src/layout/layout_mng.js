@@ -47,12 +47,16 @@ class LayoutMng {
         // clear all dialogs
         this.clear();
         // init
+        let lastDlgId = -1;
         for (let layoutDlgData of layoutData.dlgDataList) {
             let cls = ToolDlg.findDialogClassByName(layoutDlgData.className);
             let dlg = new cls(layoutDlgData.id, layoutDlgData.prop, layoutDlgData.layout);
             dlg.appendTo(this.uiParent);
             this.dlgList.push(dlg);
+            lastDlgId = dlg.id;
         }
+        if (lastDlgId>=0)
+            this.bringToTop(lastDlgId);
         this.screen.render();
         this.layoutFilePath = layoutFilePath;
     }
@@ -76,6 +80,21 @@ class LayoutMng {
                ToolDlg.showMsg('Success!');
             }
         });
+    }
+
+    bringToTop(number) {
+        checkParam(number, 'int', 'number');
+        for (let idx in this.dlgList) {
+            let dlg = this.dlgList[idx];
+            if (dlg.id==number) {
+                dlg.ui.show();
+                dlg.ui.setFront();
+                dlg.ui.focus();
+                this.screen.render();
+                return dlg;
+            }
+        }
+        return null;
     }
 
     // Remove and destroy the specified dialog

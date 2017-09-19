@@ -16,7 +16,7 @@ class OrderActDlg extends ToolDlg {
         const blessed = require('blessed');
         // main dialog
         let attr = Object.assign(layout, {
-            width: 42, height: 13,
+            width: 42, height: 17,
         });
         let dlg = this.createFormWindow(this.title, attr);
         let form = dlg.insideForm;
@@ -41,7 +41,7 @@ class OrderActDlg extends ToolDlg {
         // input element
         this.createTextInputRow(dlg, form, 0, 'Acc.', 'acc');
         this.createTextSelRow(dlg, form, 1, 'Market', new Map([
-            ['HK','HK'], ['US','US']
+            [0,'ANY'], [1,'HK'], [2,'US']
         ]), null);
         this._.row_top += this._.row_step;
         this.createTextInputRow(dlg, form, 0, 'Symbol');
@@ -51,18 +51,23 @@ class OrderActDlg extends ToolDlg {
         this.createTextInputRow(dlg, form, 1, 'Stp.Px.', 'stopPrice');
         this._.row_top += this._.row_step;
         this.createTextSelRow(dlg, form, 0, 'Type', new Map([
-            ['limit','Limit'], ['market','Market'],
-            ['stopLimit','Stop Limit(Stp.L)'], ['stopMarket','Stop Market(Stp.M)'],
-            ['trailStopLimit','Trail Stop Limit(T.S.L)'], ['trailStopMarket','Trail Stop Market(T.S.M)']
+            [0,'Limit'], [1,'Market'],
+            [2,'Stop Limit(Stp.L)'], [3,'Stop Market(Stp.M)'],
+            [4,'Trail Stop Limit(Tra.L)'], [5,'Trail Stop Market(Tra.M)']
         ]));
         this.createTextSelRow(dlg, form, 1, 'TIF', new Map([
-            ['day','DAY'], ['ioc','IOC'], 
-            ['fok','FOK'], ['atCross','At Crossing(Cross)']
+            [0,'DAY'], [1,'IOC'], 
+            [2,'FOK'], [3,'At Crossing(Cross)']
         ]));
         this._.row_top += this._.row_step;
         this.createTextSelRow(dlg, form, 0, 'L/S', new Map([
-            ['long','Long'], ['short','Short']
+            [0,'Long'], [1,'Short']
         ]), null, 'longShort');
+        this.createTextInputRow(dlg, form, 1, 'Text');
+        this._.row_top += this._.row_step;
+        this.createTextInputRow(dlg, form, 0, 'ID');
+        this.createTextInputRow(dlg, form, 1, 'Clt.ID', 'clientOrderId');
+        this._.row_top += this._.row_step;
         // submit button
         this._.btn_open = this.createBtn('Open', {
             parent: form, name: 'open', align:'center',
@@ -76,7 +81,32 @@ class OrderActDlg extends ToolDlg {
         this._.btn_close.on('press', ()=>{ form.submit(); });
         // on submit
         form.on('submit', (data)=>{
-            bilog(JSON.stringify(data));
+            const GrpcMng = require('../../grpc/grpc_mng');
+            const req = {};
+            req.open_close = data.open? GrpcMng.tradeSvcNs.EnumOpenClose.OPEN : GrpcMng.tradeSvcNs.EnumOpenClose.CLOSE;
+            req.order = {};
+            req.order.account = data.acc;
+            req.order.order_id = data.id;
+            req.order.client_order_id = data.clientOrderId;
+            req.order.market = data.market;
+            req.order.symbol = data.symbol;
+            req.order.quantity = data.quantity;
+            req.order.price = data.price;
+            req.order.stop_price = data.stopPrice;
+            req.order.type = data.type;
+            req.order.tif = data.tif;
+            req.order.long_short = data.longShort;
+            req.order.text = data.text;
+            bilog(`orderNewSignle sending,\n\trequest=${JSON.stringify(req)}`);
+            GrpcMng.tradeClient.orderNewSingle(req, (err, rsp)=>{
+                if (err) {
+                    bwlog(`orderNewSignle failed,\n\terr=${err.toString()}`);
+                    this.showError(err.toString());
+                } else {
+                    bilog(`orderNewSignle ok, \n\treply=${JSON.stringify(rsp)}`);
+                    this.showMsg('Success!');
+                }
+            });
         });
         return dlg;
     }
@@ -119,7 +149,6 @@ class OrderActDlg extends ToolDlg {
                 width: this._.input_w
             },
             {
-                parent: dlg,
                 left:this._.c[columnIdx].input_l,
                 top:this._.row_top+1,
             }

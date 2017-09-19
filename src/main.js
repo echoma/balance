@@ -1,19 +1,4 @@
-let argv = require('minimist')(process.argv.slice(2));
-
-if (argv.h) {
-    let help = `Help:
-    -h: print help infomation.
-    -l: load this layout data file. Default layout will be used if not speicified.
-    -d: debug log file path name.
-
-Shortcuts:
-    Ctrl+g: bring the 'Global Management Dialog' to front.
-    `;
-    console.log(help);
-    process.exit(0);
-}
-
-require('./global_func');
+const argv = require('./global_init');
 
 // initialize UI
 const blessed = require('blessed');

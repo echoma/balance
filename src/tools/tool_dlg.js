@@ -63,12 +63,13 @@ class ToolDlg extends UIComp {
         this.ui = this.createUI(fianl_layout);
         // bind escape key for close action
         this.ui.key(['escape'], (ch, key)=>{
+            const LayoutMng = require('../layout/layout_mng');
             let action = this.prop.get('onEscapeKey');
             if (action=='close') {
-                const LayoutMng = require('../layout/layout_mng');
                 LayoutMng.singleton.remove(this);
             } else if (action=='hide') {
                 this.ui.hide();
+                LayoutMng.singleton.screen.render();
             }
         });
     }

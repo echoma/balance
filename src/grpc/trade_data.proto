@@ -1,0 +1,57 @@
+syntax = "proto3";
+package balance;
+
+enum EnumMarket {
+    ANY = 0;
+    HK = 1;
+    US = 2;
+}
+enum EnumOpenClose {
+    OPEN = 0;
+    CLOSE = 1;
+}
+
+message Order {
+    enum EnumType {
+        LIMIT = 0;
+        MARKET = 1;
+        STOP_LIMIT = 2;
+        STOP_MARKET = 3;
+        TRAIL_STOP_LIMIT = 4;
+        TRAIL_STOP_MARKET = 5;
+    }
+    enum EnumTif {
+        DAY = 0;
+        IOC = 1;
+        FOK = 2;
+        AT_CROSS = 3;
+    }
+    enum EnumLongShort {
+        LONG = 0;
+        SHORT = 1;
+    }
+    enum EnumStatus {
+        ACCEPTED = 0;
+        PENDING_NEW = 1;
+        NEW = 2;
+        PENDING_AMEND = 3;
+        MATCHING = 4;
+        PENDING_CANCEL = 5;
+        CANCELLED = 6;
+        PARTIAL_FILLED = 7;
+        FILLED = 8;
+    }
+    string account = 1;
+    string order_id = 2;
+    string client_order_id = 3;
+    EnumMarket market = 4;
+    string symbol = 5;
+    string quantity = 6;
+    string price = 7;
+    string stop_price = 8;
+    EnumType type = 9;
+    EnumTif tif = 10;
+    EnumLongShort long_short = 11;
+    string text = 12;
+    EnumStatus status = 13;
+}

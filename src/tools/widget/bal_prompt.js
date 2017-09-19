@@ -51,7 +51,8 @@ class BalPrompt extends UIComp {
 
     prompt(question, initialValue, callback) {
         this._.question.setContent(question);
-        this._.input.setValue(initialValue);
+        if (null!=initialValue)
+            this._.input.setValue(initialValue.toString());
         this._.input.focus();
         this._.callback = callback;
         this.ui.setFront();

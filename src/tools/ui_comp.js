@@ -182,8 +182,8 @@ class UIComp {
 
     createInput(txt, attr={}) {
         let finalAttr = Object.assign({
-            value: txt,// mouse: true,
-            keys: true,// vi: true,
+            value: txt, //mouse: true,
+            keys: true, //vi: true,
             inputOnFocus: true,
             style: this.UIStyleInput
         }, attr);
@@ -204,6 +204,9 @@ class UIComp {
 
     showMsg(txt, time=3, attr={}) {
         return UIComp.showMsg(txt, time, attr);
+    }
+    showError(txt, time=3, attr={}) {
+        return UIComp.showError(txt, time, attr);
     }
     static showMsg(txt, time=3, attr={}) {
         const LayoutMng = require('../layout/layout_mng');
@@ -326,8 +329,10 @@ class UIComp {
         });
         // button press event
         btn.on('press', ()=>{
-            btn.popupList.toggle();
-            if (btn.visible) {
+            if (btn.popupList.visible) {
+                btn.popupList.hide();
+            } else {
+                btn.popupList.show();
                 btn.popupList.top = btn.atop + 1;
                 btn.popupList.left = btn.aleft;
                 btn.popupList.setFront();
@@ -347,7 +352,7 @@ class UIComp {
             let matches = presentStr.match(/\((.+)\)$/);
             if (matches)
                 presentStr = matches[1];
-            btn.valHolder.setValue(val);
+            btn.valHolder.setValue(val.toString());
             btn.setContent('> '+presentStr);
             LayoutMng.singleton.screen.render();
         });

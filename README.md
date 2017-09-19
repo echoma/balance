@@ -52,7 +52,7 @@ RPC is defined by balance with [gRPC](https://grpc.io/). Balance is a client, an
 
 -d: debug log file path name. Log nothing if not specified.
 
--h: RPC server host, such as `localhost:50051`.
+-s: RPC server host, default is `localhost:9527`.
 
 ## Text UI Shortcuts
 
