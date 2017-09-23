@@ -10,6 +10,10 @@ enum EnumOpenClose {
     OPEN = 0;
     CLOSE = 1;
 }
+enum EnumLongShort {
+    LONG = 0;
+    SHORT = 1;
+}
 
 message Order {
     enum EnumType {
@@ -25,10 +29,6 @@ message Order {
         IOC = 1;
         FOK = 2;
         AT_CROSS = 3;
-    }
-    enum EnumLongShort {
-        LONG = 0;
-        SHORT = 1;
     }
     enum EnumStatus {
         ACCEPTED = 0;
@@ -54,4 +54,30 @@ message Order {
     EnumLongShort long_short = 11;
     string text = 12;
     EnumStatus status = 13;
+}
+
+message CashPosition {
+    EnumMarket market = 1;
+    string currency = 2;
+    EnumLongShort long_short = 3;
+    string balance = 4;
+    string available = 5;
+    string settled = 6;
+}
+
+message StockPoisition {
+    EnumMarket market = 1;
+    string symbol = 2;
+    EnumLongShort long_short = 3;
+    string balance = 4;
+    string available = 5;
+    string settled = 6;
+    string market_value = 7;
+}
+
+message AccountAsset {
+    EnumMarket market = 1;
+    string account = 2;
+    repeated CashPosition cash_positions = 3;
+    repeated StockPoisition stock_positions = 4;
 }

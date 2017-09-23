@@ -4,6 +4,8 @@ const LayoutMng = require('../../layout/layout_mng');
 // The order action dialog
 class OrderActDlg extends ToolDlg {
 
+    // Get the category of this tool dialog class.
+    static get category() { return ToolDlg.CATEGORY_TRADE; }
     // Get the default title
     static get defaultTitle() { return 'Order Input/Amend'; }
 
@@ -13,6 +15,7 @@ class OrderActDlg extends ToolDlg {
 
     // Create the UI instance
     createUI(layout) {
+        const GrpcMng = require('../../grpc/grpc_mng');
         const blessed = require('blessed');
         // main dialog
         let attr = Object.assign(layout, {
@@ -41,7 +44,9 @@ class OrderActDlg extends ToolDlg {
         // input element
         this.createTextInputRow(dlg, form, 0, 'Acc.', 'acc');
         this.createTextSelRow(dlg, form, 1, 'Market', new Map([
-            [0,'ANY'], [1,'HK'], [2,'US']
+            [GrpcMng.tradeSvcNs.EnumMarket.ANY,'ANY'], 
+            [GrpcMng.tradeSvcNs.EnumMarket.HK,'HK'],
+            [GrpcMng.tradeSvcNs.EnumMarket.US,'US']
         ]), null);
         this._.row_top += this._.row_step;
         this.createTextInputRow(dlg, form, 0, 'Symbol');
@@ -51,17 +56,23 @@ class OrderActDlg extends ToolDlg {
         this.createTextInputRow(dlg, form, 1, 'Stp.Px.', 'stopPrice');
         this._.row_top += this._.row_step;
         this.createTextSelRow(dlg, form, 0, 'Type', new Map([
-            [0,'Limit'], [1,'Market'],
-            [2,'Stop Limit(Stp.L)'], [3,'Stop Market(Stp.M)'],
-            [4,'Trail Stop Limit(Tra.L)'], [5,'Trail Stop Market(Tra.M)']
+            [GrpcMng.tradeSvcNs.Order.EnumType.LIMIT,'Limit'],
+            [GrpcMng.tradeSvcNs.Order.EnumType.MARKET,'Market'],
+            [GrpcMng.tradeSvcNs.Order.EnumType.STOP_LIMIT,'Stop Limit(Stp.L)'], 
+            [GrpcMng.tradeSvcNs.Order.EnumType.STOP_MARKET,'Stop Market(Stp.M)'],
+            [GrpcMng.tradeSvcNs.Order.EnumType.TRAIL_STOP_LIMIT,'Trail Stop Limit(Tra.L)'],
+            [GrpcMng.tradeSvcNs.Order.EnumType.TRAIL_STOP_MARKET,'Trail Stop Market(Tra.M)']
         ]));
         this.createTextSelRow(dlg, form, 1, 'TIF', new Map([
-            [0,'DAY'], [1,'IOC'], 
-            [2,'FOK'], [3,'At Crossing(Cross)']
+            [GrpcMng.tradeSvcNs.Order.EnumTif.DAY,'DAY'],
+            [GrpcMng.tradeSvcNs.Order.EnumTif.IOC,'IOC/FAK'], 
+            [GrpcMng.tradeSvcNs.Order.EnumTif.FOK,'FOK'],
+            [GrpcMng.tradeSvcNs.Order.EnumTif.AT_CROSS,'At Crossing(Cross)']
         ]));
         this._.row_top += this._.row_step;
         this.createTextSelRow(dlg, form, 0, 'L/S', new Map([
-            [0,'Long'], [1,'Short']
+            [GrpcMng.tradeSvcNs.EnumLongShort.LONG,'Long'],
+            [GrpcMng.tradeSvcNs.EnumLongShort.SHORT,'Short']
         ]), null, 'longShort');
         this.createTextInputRow(dlg, form, 1, 'Text');
         this._.row_top += this._.row_step;
@@ -81,7 +92,6 @@ class OrderActDlg extends ToolDlg {
         this._.btn_close.on('press', ()=>{ form.submit(); });
         // on submit
         form.on('submit', (data)=>{
-            const GrpcMng = require('../../grpc/grpc_mng');
             const req = {};
             req.open_close = data.open? GrpcMng.tradeSvcNs.EnumOpenClose.OPEN : GrpcMng.tradeSvcNs.EnumOpenClose.CLOSE;
             req.order = {};
@@ -103,6 +113,8 @@ class OrderActDlg extends ToolDlg {
                     bwlog(`orderNewSignle failed,\n\terr=${err.toString()}`);
                     this.showError(err.toString());
                 } else {
+                    const GrpcEnumFix = require('../../grpc/grpc_enum_fix');
+                    GrpcEnumFix.fixOrder(rsp);
                     bilog(`orderNewSignle ok, \n\treply=${JSON.stringify(rsp)}`);
                     this.showMsg('Success!');
                 }
@@ -122,7 +134,7 @@ class OrderActDlg extends ToolDlg {
             right: this._.c[columnIdx].txt_r,
             height: 1,
         });
-        this._.nm[name].form = this.createInput('', {
+        this._.nm[name].input = this.createInput('', {
             parent: form, name: name,
             top:this._.row_top,
             left: this._.c[columnIdx].input_l, 

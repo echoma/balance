@@ -6,6 +6,7 @@ class ToolDlg extends UIComp {
 
     // Several tool categories, 
     static get CATEGORY_HELPER() { return 'helper' }
+    static get CATEGORY_TRADE() { return 'trade' }
 
     // Register a dialog class by name
     static registerDialogClass(className, cls) {

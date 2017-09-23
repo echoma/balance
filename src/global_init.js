@@ -15,6 +15,7 @@ Options:
 
 Shortcuts:
     Ctrl+g: bring the 'Global Management Dialog' to front.
+    Ctrl+f: bring the dialog with the specified id to the front.
     `;
     console.log(help);
     process.exit(0);
@@ -74,7 +75,10 @@ const logger = new (winston.Logger)({
         })
     ]
 });
-logger.exitOnError = false;
+logger.exitOnError = true;
+setTimeout(()=>{
+    logger.exitOnError = false;
+}, 3000);
 bilog(`
 **************************
 *       BLANCE 0.1       *

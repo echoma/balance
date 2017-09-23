@@ -1,4 +1,5 @@
 const blessed = require('blessed');
+const contrib = require('blessed-contrib');
 
 // Any UI component should extend this class
 class UIComp {
@@ -9,8 +10,6 @@ class UIComp {
         this.ui = null;
         // properties of this component
         this.prop = new Map();
-        // ui widget could be referenced by this object
-        this.uiWidgets = new Object();
     }
 
     // Destroy this dialog
@@ -107,6 +106,28 @@ class UIComp {
             selected: {fg: 'black', bg: 'cyan', bold: true}
         }
     }
+    // Get the UI style of tables
+    get UIStyleTable() {
+        return {
+            fg: 'black', bg: 'blue',
+            bold: true,
+            border: { type: 'line', fg: 'black', bg: 'blue'},
+        }
+    }
+    // Get the UI style title tags of table
+    UiStyleTableTitle(title) {
+        return `{black-fg,blue-bg,bold}${title}{/black-fg,blue-bg,bold}`
+    }
+    // Get the UI style of records list in the tables
+    get UIStyleTableRecords() {
+        return {
+            fg: 'black', bg: 'blue',
+            focus: { fg: 'white', bg: 'blue' },
+            item: {fg: 'black', bg: 'blue'},
+            selected: {fg: 'black', bg: 'cyan'},
+            scrollbar: {fg: 'white', bg: 'black'}
+        }
+    }
 
     /**
      * Create a window which has a form inside.
@@ -156,7 +177,7 @@ class UIComp {
             draggable: true, 
             style: this.UIStyleWindow
         }, attr);
-        return blessed.form(finalAttr);
+        return blessed.box(finalAttr);
     }
 
     /**
@@ -262,7 +283,7 @@ class UIComp {
     /**
      * Create an selection list. it's shown as a button at first.
      * When you press it, it will pop-up a list in which you can select items.
-     * @param {Map} optionMap value->presentString pairs shown in the list. value is the option value, presentString is shown in the list item.
+     * @param {Map} optionMap (optionValue=>presentString) pairs shown in the list. optionValue is the value of each option, presentString is shown in the list item.
      * @param {any} defaultOption the vlaue of default option. If null, the first option in optionMap will be used.
      * @param {jsonObject} buttonAttr the attribute when create the button.
      * @param {jsonObject} listAttr the attribute when create the list.
@@ -357,6 +378,37 @@ class UIComp {
             LayoutMng.singleton.screen.render();
         });
         return btn;
+    }
+
+    /**
+     * Create an table.
+     * @param {Object} tableOptions see BalTable constructor for more detail.
+     * @param {Object} boxOptions same as above.
+     * @param {Object} listOptions same as above.
+     */
+    createTable(tableOptions, boxOptions=null, listOptions=null) {
+        //box options
+        if (!isEmpty(boxOptions.label))
+            boxOptions.label = this.UiStyleTableTitle(boxOptions.label);
+        let finalBoxOpt = Object.assign(
+            {
+                mouse: false, keys: false, 
+                tags: true, 
+                border: 'line',
+                style: this.UIStyleTable,
+            }, boxOptions
+        );
+        // list options
+        let finalListOpt = Object.assign(
+            {
+                mouse: true, keys: true, 
+                tags: false, 
+                style: this.UIStyleTableRecords,
+            }, listOptions
+        );
+        // create table
+        let BalTable = require('./widget/bal_table');
+        return new BalTable(tableOptions, finalBoxOpt, finalListOpt);
     }
 }
 

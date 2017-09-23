@@ -2,7 +2,7 @@ const blessed = require('blessed');
 const UIComp = require('../ui_comp')
 const LayoutMng = require('../../layout/layout_mng');
 
-// The blessed's prompt is broker, so I wrote one by myself
+// blessed官方的promp有bug，所以自己写了一个。
 class BalPrompt extends UIComp {
     constructor(parent, title = '') {
         super();
