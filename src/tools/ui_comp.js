@@ -27,7 +27,7 @@ class UIComp {
     // Get the UI style of this dialog
     get UIStyleWindow() {
         return {
-            fg: 'white', bg: 'blue',
+            fg: 'black', bg: 'blue',
             border: { fg: 'blue' },
             hover: { bg: 'green' }
         };
@@ -409,6 +409,22 @@ class UIComp {
         // create table
         let BalTable = require('./widget/bal_table');
         return new BalTable(tableOptions, finalBoxOpt, finalListOpt);
+    }
+
+    /**
+     * create a ensure box
+     */
+    createEnsure(title, attr=null) {
+        let BalEnsure = require('./widget/bal_ensure');
+        let finalAttr = Object.assign(
+            {
+                border: 'line',
+                top: 4, left: 'center',
+                width: 30, height: 7,
+                style: this.UIStyleWindow,
+            }, attr
+        );
+        return new BalEnsure(title, finalAttr);
     }
 }
 

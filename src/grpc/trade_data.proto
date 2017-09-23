@@ -5,6 +5,7 @@ enum EnumMarket {
     ANY = 0;
     HK = 1;
     US = 2;
+    FX = 3;
 }
 enum EnumOpenClose {
     OPEN = 0;
@@ -65,7 +66,7 @@ message CashPosition {
     string settled = 6;
 }
 
-message StockPoisition {
+message StockPosition {
     EnumMarket market = 1;
     string symbol = 2;
     EnumLongShort long_short = 3;
@@ -78,6 +79,6 @@ message StockPoisition {
 message AccountAsset {
     EnumMarket market = 1;
     string account = 2;
-    repeated CashPosition cash_positions = 3;
-    repeated StockPoisition stock_positions = 4;
+    repeated CashPosition cash_positions= 3;
+    repeated StockPosition stock_positions = 4;
 }

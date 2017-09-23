@@ -1,6 +1,7 @@
 const blessed = require('blessed');
 const stripAnsi = require('strip-ansi');
 const UIComp = require('../ui_comp');
+const LayoutMng = require('../../layout/layout_mng');
 
 // blessed的listtable太弱，blessed-contrib的表格组件又一堆bug，只好自己写一个。
 class BalTable extends UIComp {
@@ -76,25 +77,29 @@ class BalTable extends UIComp {
     // Clear all record in the table
     clear() {
         this._.list.clearItems();
+        LayoutMng.singleton.screen.render();
     }
 
     // insert one record in the specified position
     insertRecord(i, record) {
         this._.list.insertItem(i, this.calRowText(record));
+        LayoutMng.singleton.screen.render();
     }
 
     // append one record (at the tail)
     appendRecord(record) {
         this._.list.addItem(this.calRowText(record));
+        LayoutMng.singleton.screen.render();
     }
 
     // refresh the table with this record set
     setRecordSet(recordList) {
-        this.clear();
+        this._.list.clearItems();
         let items = recordList.map((record)=>{
             return this.calRowText(record); 
         });
         this._.list.setItems(items);
+        LayoutMng.singleton.screen.render();
     }
 
     // Calculate one record in to list text.

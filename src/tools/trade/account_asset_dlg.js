@@ -6,11 +6,14 @@ class AccountAssetDlg extends ToolDlg {
     
     // Get the category of this tool dialog class.
     static get category() { return ToolDlg.CATEGORY_TRADE; }
+    // Get a brief description for this class.
+    static get description() { return 'Shows cash and stock positions of an account.'; }
     // Get the default title
     static get defaultTitle() { return 'Account Asset'; }
 
     constructor(id, prop={}, layout={}) {
         super(id, prop, layout);
+        this.installTimer();
     }
 
     // Create the UI instance
@@ -29,7 +32,7 @@ class AccountAssetDlg extends ToolDlg {
         this._.row_top = 0;
         this._.row_step = 2;
         // cash table
-        let cashTable = this.createTable({
+        let cashTable = this._.cashTable = this.createTable({
             parent: form,
             columns: [
                 ['Mkt.', 5, 'right'],
@@ -44,17 +47,9 @@ class AccountAssetDlg extends ToolDlg {
             height:6,
             label: 'Cash'
         });
-        cashTable.setRecordSet([
-            ['ANY','USD','L','9,284,713.00','9,284,713.00','9,284,713.00'],
-            ['HK','HKD','L','84,713.00','84,713.00','84,713.00'],
-            ['US','USD','L','84,713.00','84,713.00','84,713.00'],
-            ['A','HKD','L','84,713.00','84,713.00','84,713.00'],
-            ['SGP','HKD','L','84,713.00','84,713.00','84,713.00'],
-            ['JP','HKD','L','84,713.00','84,713.00','84,713.00'],
-        ]);
         this._.row_top += cashTable.ui.height;
         // stock table
-        let stockTable = this.createTable({
+        let stockTable = this._.stockTable  = this.createTable({
             parent: form,
             columns: [
                 ['Mkt.', 5, 'right'],
@@ -70,16 +65,85 @@ class AccountAssetDlg extends ToolDlg {
             height:8,
             label: 'Stock'
         });
-        stockTable.setRecordSet([
-            ['FX','USD/CNY','L','2000','2000','2000','13180'],
-            ['US','RHT','L','500','500','500','53150'],
-            ['US','MSFT','L','200','100','200','14882'],
-            ['US','BABA','S','100','100','100','17814'],
-            ['HK','700','L','500','500','500','173000'],
-            ['HK','3888','L','100','0','100','18300'],
-            ['CHN','2594','L','100','100','100','6232'],
-        ]);
         return dlg;
+    }
+
+    // 安装定时器，用于定时请求账户数据，并刷新到界面上
+    installTimer() {
+        const GrpcMng = require('../../grpc/grpc_mng');
+        this._.lastReqTime = 0;
+        this._.lastRspTime = 0;
+        this._.timer = setInterval(()=>{
+            let market = GrpcMng.tradeSvcNs.EnumMarket.ANY;
+            let account = '';
+            if (this.prop.has('auto_refresh')) {
+                if (0==parseInt(this.prop.get('auto_refresh')))
+                    return;
+            }
+            if (this.prop.has('account'))
+                account = this.prop.get('account');
+            let request_interval = 1000; // 两次请求间的最小时间间隔，默认为1秒
+            if (this.prop.has('request_interval'))
+                request_interval = this.prop.get('request_interval');
+            let stamp = (new Date()).getTime();
+            if (stamp - this._.lastReqTime > request_interval // 达到了最小请求间隔
+                && (this._.lastRspTime > this._.lastReqTime // 最近一次请求已返回
+                    || stamp - this._.lastReqTime>30000) // 或 最近一次请求已超时(30秒)
+            ) {
+                this._.lastReqTime = stamp;
+                const req = {};
+                req.market = market;
+                req.account = account;
+                bilog(`accountAsset sending,\n\trequest=${JSON.stringify(req)}`);
+                GrpcMng.tradeClient.accountAsset(req, (err, rsp)=>{
+                    this._.lastRspTime = (new Date()).getTime();
+                    if (err) {
+                        bwlog(`accountAsset failed,\n\terr=${err.toString()}`);
+                        this.showError(err.toString());
+                    } else {
+                        const GrpcEnumFix = require('../../grpc/grpc_enum_fix');
+                        GrpcEnumFix.fixAccountAsset(rsp);
+                        //bilog(`accountAsset ok, \n\treply=${JSON.stringify(rsp)}`);
+                        this.showAccountAsset(rsp);
+                    }
+                });
+            }
+        }, 200);
+    }
+
+    // 展示数据
+    showAccountAsset(aa) {
+        const GrpcMng = require('../../grpc/grpc_mng');
+        const ns = GrpcMng.tradeSvcNs;
+        const cashRecords = aa.cash_positions.map((cp)=>{
+            let market = 'ANY';
+            if (cp.market==ns.EnumMarket.US) market = 'US';
+            if (cp.market==ns.EnumMarket.HK) market = 'HK';
+            return [
+                market,
+                cp.currency,
+                cp.long_short==ns.EnumLongShort.LONG? 'L':'S',
+                cp.balance,
+                cp.available,
+                cp.settled
+            ];
+        });
+        this._.cashTable.setRecordSet(cashRecords);
+        const stockRecords = aa.stock_positions.map((sp)=>{
+            let market = 'ANY';
+            if (sp.market==ns.EnumMarket.US) market = 'US';
+            if (sp.market==ns.EnumMarket.HK) market = 'HK';
+            return [
+                market,
+                sp.symbol,
+                sp.long_short==ns.EnumLongShort.LONG? 'L':'S',
+                sp.balance,
+                sp.available,
+                sp.settled,
+                sp.market_value
+            ];
+        });
+        this._.stockTable.setRecordSet(stockRecords);
     }
 }
 

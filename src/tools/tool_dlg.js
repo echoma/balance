@@ -27,6 +27,10 @@ class ToolDlg extends UIComp {
         }
         return null;
     }
+    // Get the dialog register table
+    static get dialogRegisterTable() { 
+        return ToolDlg.nameRegister;
+    }
     // load and register all built-in dialog class
     static loadAllBuiltIn() {
         require ('require-all')({
@@ -62,21 +66,28 @@ class ToolDlg extends UIComp {
             top: 'center'
         }, layout);
         this.ui = this.createUI(fianl_layout);
+        this.closeEnsure = null;
         // bind escape key for close action
         this.ui.key(['escape'], (ch, key)=>{
             const LayoutMng = require('../layout/layout_mng');
             let action = this.prop.get('onEscapeKey');
             if (action=='close') {
-                LayoutMng.singleton.remove(this);
+                this.showCloseEnsure();
             } else if (action=='hide') {
                 this.ui.hide();
                 LayoutMng.singleton.screen.render();
             }
         });
+        // bind Ctrl-r key for property editor
+        this.ui.key(['C-r'], (ch, key)=>{
+            this.showPropertyEditor();
+        });
     }
 
     // Get the category of this tool dialog class.
     static get category() { return ToolDlg.CATEGORY_HELPER; }
+    // Get a brief description for this class.
+    static get description() { return 'Base class of all tool dialogs.'; }
     // Get the default title of this dialog class.
     static get defaultTitle() { return 'Tool'; }
 
@@ -119,10 +130,30 @@ class ToolDlg extends UIComp {
             }
         };
     }
+
+    // show a close ensurement
+    showCloseEnsure() {
+        if (null==this.closeEnsure) {
+            this.closeEnsure = this.createEnsure('Sure?', {
+                parent: this.ui,
+            });
+        }
+        this.closeEnsure.ask('Are u sure to close?', (yes)=>{
+            bilog(JSON.stringify(yes));
+            if (yes) {
+                const LayoutMng = require('../layout/layout_mng');
+                LayoutMng.singleton.remove(this);
+            }
+        });
+    }
+
+    // show the property editor
+    showPropertyEditor() {
+        ;
+    }
 }
 
 // The global dialog class register, this maintains a map from class name to class.
 ToolDlg.nameRegister = new Map();
-ToolDlg.registerDialogClass('ToolDlg', ToolDlg);
 
 module.exports = ToolDlg;

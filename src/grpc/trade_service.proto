@@ -5,9 +5,15 @@ import 'trade_data.proto';
 
 service Trade {
     rpc orderNewSingle (OrderNewSingleRequest) returns (Order) {}
+    rpc accountAsset (AccountAssetRequest) returns (AccountAsset) {}
 }
 
 message OrderNewSingleRequest {
     Order order = 1;
     EnumOpenClose open_close = 2;
+}
+
+message AccountAssetRequest {
+    EnumMarket market = 1;
+    string account = 2;
 }

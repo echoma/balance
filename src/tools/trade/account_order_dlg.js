@@ -6,6 +6,8 @@ class AccountOrderDlg extends ToolDlg {
     
     // Get the category of this tool dialog class.
     static get category() { return ToolDlg.CATEGORY_TRADE; }
+    // Get a brief description for this class.
+    static get description() { return 'Shows a list of orders of an account.'; }
     // Get the default title
     static get defaultTitle() { return 'Account Order'; }
 

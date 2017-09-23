@@ -7,6 +7,8 @@ class GlobalMngDlg extends ToolDlg {
     static get singleton() { return GlobalMngDlg._singleton; }
     static set singleton(s) { throw new Error('GlobalMngDlg singleton can not be set'); }
 
+    // Get a brief description for this class.
+    static get description() { return 'Manage the global settings and dialog layout.'; }
     // Get the default title
     static get defaultTitle() { return 'Global Mng'; }
 
@@ -17,6 +19,7 @@ class GlobalMngDlg extends ToolDlg {
         LayoutMng.singleton.screen.key(['C-g'], (ch, key)=>{
             this.ui.show();
             this.ui.setFront();
+            this.ui.focus();
             LayoutMng.singleton.screen.render();
         });
         LayoutMng.singleton.screen.key('C-f', (ch, key)=>{
@@ -90,6 +93,15 @@ class GlobalMngDlg extends ToolDlg {
         });
         this._.btn_acc_ast.on('press', ()=>{
             let cls = ToolDlg.findDialogClassByName('AccountAssetDlg');
+            LayoutMng.singleton.add(cls);
+        });
+        // button: tool list
+        this._.btn_tool_list = this.createBtn('Tool List', {
+            parent: form, 
+            left:2, top:7,
+        });
+        this._.btn_tool_list.on('press', ()=>{
+            let cls = ToolDlg.findDialogClassByName('ToolListDlg');
             LayoutMng.singleton.add(cls);
         });
         return dlg;
