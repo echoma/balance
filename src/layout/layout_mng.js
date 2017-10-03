@@ -50,6 +50,10 @@ class LayoutMng {
         let lastDlgId = -1;
         for (let layoutDlgData of layoutData.dlgDataList) {
             let cls = ToolDlg.findDialogClassByName(layoutDlgData.className);
+            if (null==cls) {
+                bilog(`class not found, className=${$layoutDlgData.className}, id=${layoutDlgData.id}`);
+                continue;
+            }
             let dlg = new cls(layoutDlgData.id, layoutDlgData.prop, layoutDlgData.layout);
             dlg.appendTo(this.uiParent);
             this.dlgList.push(dlg);
@@ -103,7 +107,6 @@ class LayoutMng {
             let dlg = this.dlgList[idx];
             if (the_dlg==dlg)
             {
-                dlg.removeFrom(this.uiParent);
                 dlg.destroy();
                 this.dlgList.splice(idx, 1);
                 this.screen.render();
@@ -116,7 +119,6 @@ class LayoutMng {
     clear() {
         for (let idx in this.dlgList) {
             let dlg = this.dlgList[idx];
-            dlg.removeFrom(this.uiParent);
             dlg.destroy();
         }
         this.dlgList = [];

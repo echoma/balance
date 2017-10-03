@@ -13,7 +13,8 @@ class GlobalMngDlg extends ToolDlg {
     static get defaultTitle() { return 'Global Mng'; }
 
     constructor(id, prop={}, layout={}) {
-        prop.onEscapeKey='hide';
+        prop._onEscapeKey='hide';
+        prop._resizeable='0';
         super(id, prop, layout);
         GlobalMngDlg._singleton = this;
         LayoutMng.singleton.screen.key(['C-g'], (ch, key)=>{

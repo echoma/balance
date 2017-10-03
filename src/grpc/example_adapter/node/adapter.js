@@ -8,7 +8,7 @@ let server = new grpc.Server();
 
 server.addService(tradeSvcNs.Trade.service, {
     orderNewSingle: (call, callback)=>{
-        console.log('on orderNewSingle()');
+        console.log(`on orderNewSingle(${JSON.stringify(call.request)})`);
         if (Math.random()>0.5) {
             console.log('\treturn success');
             call.request.order.status = tradeSvcNs.Order.EnumStatus.NEW;
@@ -20,7 +20,7 @@ server.addService(tradeSvcNs.Trade.service, {
         }
     },
     accountAsset: (call, callback)=>{
-        console.log('on accountAsset()');
+        console.log(`on accountAsset(${JSON.stringify(call.request)})`);
         let asset = {
             market : call.request.market,
             account : call.request.account,

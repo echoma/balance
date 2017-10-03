@@ -12,6 +12,7 @@ class OrderActDlg extends ToolDlg {
     static get defaultTitle() { return 'Order Input/Amend'; }
 
     constructor(id, prop={}, layout={}) {
+        prop._resizeable='0';
         super(id, prop, layout);
     }
 

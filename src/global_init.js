@@ -57,8 +57,8 @@ const logger = new (winston.Logger)({
     transports: [
         new (winston.transports.File)({
             filename: argv.d? argv.d : '/dev/null',
-            maxsize: 100*1024,
-            maxFiles: 1,
+            //maxsize: 10*1024,
+            //maxFiles: 2,
             handleExceptions: true,
             humanReadableUnhandledException: true,
             json: false,

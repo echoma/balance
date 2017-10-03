@@ -18,9 +18,9 @@ class ToolListDlg extends ToolDlg {
         const GrpcMng = require('../../grpc/grpc_mng');
         const blessed = require('blessed');
         // main dialog
-        let attr = Object.assign(layout, {
+        let attr = Object.assign({
             width: 90, height: 20,
-        });
+        }, layout);
         let dlg = this.createFormWindow(this.title, attr);
         let form = dlg.insideForm;
         // layout variables

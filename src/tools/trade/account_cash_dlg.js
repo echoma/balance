@@ -1,15 +1,15 @@
 const ToolDlg = require('../tool_dlg');
 const LayoutMng = require('../../layout/layout_mng');
 
-// The account asset dialog
-class AccountAssetDlg extends ToolDlg {
+// The account cash dialog
+class AccountCashDlg extends ToolDlg {
     
     // Get the category of this tool dialog class.
     static get category() { return ToolDlg.CATEGORY_TRADE; }
     // Get a brief description for this class.
-    static get description() { return 'Shows cash and stock positions of an account.'; }
+    static get description() { return 'Shows cash of an account.'; }
     // Get the default title
-    static get defaultTitle() { return 'Account Asset'; }
+    static get defaultTitle() { return 'Account Cash'; }
 
     constructor(id, prop={}, layout={}) {
         if (!prop.hasOwnProperty('auto_refresh'))
@@ -25,9 +25,9 @@ class AccountAssetDlg extends ToolDlg {
         const GrpcMng = require('../../grpc/grpc_mng');
         const blessed = require('blessed');
         // main dialog
-        let attr = Object.assign({
-            width: 66, height: 16,
-        }, layout);
+        let attr = Object.assign(layout, {
+            width: 57, height: 8,
+        });
         let dlg = this.createFormWindow(this.title, attr);
         let form = dlg.insideForm;
         // layout variables
@@ -42,32 +42,14 @@ class AccountAssetDlg extends ToolDlg {
                 ['Mkt.', 5, 'right'],
                 ['CCY', 3],
                 ['L/S', 3, 'center'],
-                ['Balance', 14, 'right'],
-                ['Available', 14, 'right'],
-                ['Settled', 14, 'right'],
+                ['Balance', 11, 'right'],
+                ['Available', 11, 'right'],
+                ['Settled', 11, 'right'],
             ],
         }, {
             top:this._.row_top, left: 0, right: 0,
             height:6,
             label: 'Cash'
-        });
-        this._.row_top += cashTable.ui.height;
-        // stock table
-        let stockTable = this._.stockTable  = this.createTable({
-            parent: form,
-            columns: [
-                ['Mkt.', 5, 'right'],
-                ['Symbol', 10],
-                ['L/S', 3, 'center'],
-                ['Balance', 9, 'right'],
-                ['Available', 9, 'right'],
-                ['Settled', 9, 'right'],
-                ['Value', 9, 'right'],
-            ],
-        }, {
-            top:this._.row_top, left: 0, right: 0,
-            height:8,
-            label: 'Stock'
         });
         return dlg;
     }
@@ -150,21 +132,6 @@ class AccountAssetDlg extends ToolDlg {
             ];
         });
         this._.cashTable.setRecordSet(cashRecords);
-        const stockRecords = aa.stock_positions.map((sp)=>{
-            let market = 'ANY';
-            if (sp.market==ns.EnumMarket.US) market = 'US';
-            if (sp.market==ns.EnumMarket.HK) market = 'HK';
-            return [
-                market,
-                sp.symbol,
-                sp.long_short==ns.EnumLongShort.LONG? 'L':'S',
-                sp.balance,
-                sp.available,
-                sp.settled,
-                sp.market_value
-            ];
-        });
-        this._.stockTable.setRecordSet(stockRecords);
     }
 
     addPropertyEditorComps() {
@@ -215,6 +182,6 @@ class AccountAssetDlg extends ToolDlg {
     }
 }
 
-ToolDlg.registerDialogClass('AccountAssetDlg', AccountAssetDlg);
+ToolDlg.registerDialogClass('AccountCashDlg', AccountCashDlg);
 
-module.exports = AccountAssetDlg;
+module.exports = AccountCashDlg;

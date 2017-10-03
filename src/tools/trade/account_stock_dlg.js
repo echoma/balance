@@ -1,15 +1,15 @@
 const ToolDlg = require('../tool_dlg');
 const LayoutMng = require('../../layout/layout_mng');
 
-// The account asset dialog
-class AccountAssetDlg extends ToolDlg {
+// The account stock dialog
+class AccountStockDlg extends ToolDlg {
     
     // Get the category of this tool dialog class.
     static get category() { return ToolDlg.CATEGORY_TRADE; }
     // Get a brief description for this class.
-    static get description() { return 'Shows cash and stock positions of an account.'; }
+    static get description() { return 'Shows stock positions of an account.'; }
     // Get the default title
-    static get defaultTitle() { return 'Account Asset'; }
+    static get defaultTitle() { return 'Account Stock'; }
 
     constructor(id, prop={}, layout={}) {
         if (!prop.hasOwnProperty('auto_refresh'))
@@ -25,9 +25,9 @@ class AccountAssetDlg extends ToolDlg {
         const GrpcMng = require('../../grpc/grpc_mng');
         const blessed = require('blessed');
         // main dialog
-        let attr = Object.assign({
-            width: 66, height: 16,
-        }, layout);
+        let attr = Object.assign(layout, {
+            width: 66, height: 10,
+        });
         let dlg = this.createFormWindow(this.title, attr);
         let form = dlg.insideForm;
         // layout variables
@@ -35,23 +35,6 @@ class AccountAssetDlg extends ToolDlg {
         this._.row_w = form.width-2;
         this._.row_top = 0;
         this._.row_step = 2;
-        // cash table
-        let cashTable = this._.cashTable = this.createTable({
-            parent: form,
-            columns: [
-                ['Mkt.', 5, 'right'],
-                ['CCY', 3],
-                ['L/S', 3, 'center'],
-                ['Balance', 14, 'right'],
-                ['Available', 14, 'right'],
-                ['Settled', 14, 'right'],
-            ],
-        }, {
-            top:this._.row_top, left: 0, right: 0,
-            height:6,
-            label: 'Cash'
-        });
-        this._.row_top += cashTable.ui.height;
         // stock table
         let stockTable = this._.stockTable  = this.createTable({
             parent: form,
@@ -136,20 +119,6 @@ class AccountAssetDlg extends ToolDlg {
     showAccountAsset(aa) {
         const GrpcMng = require('../../grpc/grpc_mng');
         const ns = GrpcMng.tradeSvcNs;
-        const cashRecords = aa.cash_positions.map((cp)=>{
-            let market = 'ANY';
-            if (cp.market==ns.EnumMarket.US) market = 'US';
-            if (cp.market==ns.EnumMarket.HK) market = 'HK';
-            return [
-                market,
-                cp.currency,
-                cp.long_short==ns.EnumLongShort.LONG? 'L':'S',
-                cp.balance,
-                cp.available,
-                cp.settled
-            ];
-        });
-        this._.cashTable.setRecordSet(cashRecords);
         const stockRecords = aa.stock_positions.map((sp)=>{
             let market = 'ANY';
             if (sp.market==ns.EnumMarket.US) market = 'US';
@@ -215,6 +184,6 @@ class AccountAssetDlg extends ToolDlg {
     }
 }
 
-ToolDlg.registerDialogClass('AccountAssetDlg', AccountAssetDlg);
+ToolDlg.registerDialogClass('AccountStockDlg', AccountStockDlg);
 
-module.exports = AccountAssetDlg;
+module.exports = AccountStockDlg;

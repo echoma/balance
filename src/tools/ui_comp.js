@@ -12,17 +12,16 @@ class UIComp {
         this.prop = new Map();
     }
 
-    // Destroy this dialog
+    // Destroy this component
     destroy() {
-        if (this.ui)
+        if (this.ui) {
             this.ui.destroy();
+        }
         this.ui = null;
     }
 
     // Append this dialog to the specified UI container
     appendTo(container) { container.append(this.ui); }
-    // Remove this dialog from the specified UI container
-    removeFrom(container) { container.remove(this.ui); }
 
     // Get the UI style of this dialog
     get UIStyleWindow() {
@@ -421,7 +420,7 @@ class UIComp {
                 border: 'line',
                 top: 4, left: 'center',
                 width: 30, height: 7,
-                style: this.UIStyleWindow,
+                //style: this.UIStyleWindow,
             }, attr
         );
         return new BalEnsure(title, finalAttr);
