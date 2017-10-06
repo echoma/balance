@@ -2,15 +2,23 @@
 
 命令行下的证券交易前端。文本交互界面基于[blessed](https://github.com/chjj/blessed)技术。
 
-目前本项目仍然在开发中。
+目前本项目仍然在开发中。前段界面已可以工作，针对几种常见API的适配器还在规划中。
 
-![order_act](https://media.githubusercontent.com/media/echoma/lfs/master/balance/img/order_act.png)
+![order_act.png](https://media.githubusercontent.com/media/echoma/lfs/master/balance/img/order_act.png)
+
+以上截图对应的窗口布局文件：![order_act.dat](https://raw.githubusercontent.com/echoma/lfs/master/balance/img/order_act.dat)
 
 ## balance的目标用户
 
 balance的目标用户是使用linux的交易系统开发者、算法交易者。这些用户通常有以下需求：
   - 需要基于命令行的、交互界面友好的交易前端。
-  - 需要命令行工具实时查看数据报表。
+  - 需要命令行工具实时查看交易数据。
+
+## balance的特性
+
+  - 支持鼠标操作（但有些bug）。当然也可以只使用键盘完成所有操作。
+  - 支持布局保存和加载，程序重启后可以安装之前保存的窗口布局和参数继续工作。
+  - 纯前端，与后端逻辑解耦。使用者可以通过适配器适配各种各样的交易API。
 
 ## balance如何跟多种多样的交易API或交易后台配合工作呢？
 
@@ -18,8 +26,6 @@ balance的目标用户是使用linux的交易系统开发者、算法交易者�
   - 第1层：就是balance，它是前端界面。balance通过RPC与适配器层进行通信。
   - 第2层：适配器层是位于balance和交易API之间的中间层。适配器通过交易API（或其他通信方式）访问其他交易平台。可由第三方提供或使用着自己编写。
   - 第3层：各交易平台或券商提供的交易API。
-
-RPC由balance使用[gRPC](https://grpc.io/)进行定义。在RPC调用中，balance作为客户端，适配器作为服务端。
 
 ```txt
    +-------------+
@@ -49,14 +55,13 @@ RPC由balance使用[gRPC](https://grpc.io/)进行定义。在RPC调用中，bala
 
 ```
 
-## 拟支持的交易API
+## 如何编写自己的适配器
 
-balance计划对以下交易API自带一个可用的适配器：
-  - [上期综合交易平台-CTP](http://www.sfit.com.cn/5_2_DocumentDown.htm)
-  - [易盛API](http://www.esunny.com.cn/index.php?m=content&c=index&a=lists&catid=71)，[FAQ](https://www.gitbook.com/book/esunnyapi/esunnyapi_faq/details)
-  - [forex嘉盛API](http://fxcodebase.com/wiki/index.php/Main_Page)
+balance使用了google的[gRPC](https://grpc.io/)。在RPC调用中，balance作为客户端，适配器作为服务端。
 
-这些API的适配器将来会使用另一个github repo来承载。
+编写自己的适配器，其实就是使用grpc编写代码对请求进行响应。grpc的定义位于[src/grpc](./src/grpc)中的`*.proto`文件中。
+
+在[src/grpc/example_adapter](./src/grpc/example_adapter)中有几种语言编写的适配器例子。
 
 ## 命令行参数
 
@@ -79,3 +84,12 @@ Ctrl+g: 显示`全局管理对话框(Global Management Dialog)`。该对话框�
 Ctrl+f: 弹出一个询问框，用户输入窗口编号后，该编号对应的对话框将成为最顶层窗口。
 
 **Ctrl+r**: 在某个窗口上使用此快捷键，将弹出该对话框的配置设置界面。例如窗口的位置、打消、账户资产窗口配置账户、自动刷新频率等，因此这个快捷键非常重要。
+
+## 拟支持的交易API
+
+balance计划对以下交易API自带一个可用的适配器：
+  - [上期综合交易平台-CTP](http://www.sfit.com.cn/5_2_DocumentDown.htm)
+  - [易盛API](http://www.esunny.com.cn/index.php?m=content&c=index&a=lists&catid=71)，[FAQ](https://www.gitbook.com/book/esunnyapi/esunnyapi_faq/details)
+  - [forex嘉盛API](http://fxcodebase.com/wiki/index.php/Main_Page)
+
+这些API的适配器将来会使用另一个github repo来承载。
