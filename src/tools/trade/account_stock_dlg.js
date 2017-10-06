@@ -45,12 +45,21 @@ class AccountStockDlg extends ToolDlg {
                 ['Balance', 9, 'right'],
                 ['Available', 9, 'right'],
                 ['Settled', 9, 'right'],
-                ['Value', 9, 'right'],
+                ['Value', 11, 'right'],
             ],
         }, {
             top:this._.row_top, left: 0, right: 0,
-            height:8,
-            label: 'Stock'
+            //height:'100%-2',
+            //label: 'Stock'
+        });
+        // table select event
+        stockTable.listComp.on('select', (obj, idx)=>{
+            let sp = this.getStockByIdx(idx);
+            if (sp) {
+                let cls = ToolDlg.findDialogClassByName('OrderActDlg');
+                let dlg = LayoutMng.singleton.add(cls);
+                dlg.setStockPosition(sp);
+            }
         });
         return dlg;
     }
@@ -108,11 +117,29 @@ class AccountStockDlg extends ToolDlg {
                 } else {
                     const GrpcEnumFix = require('../../grpc/grpc_enum_fix');
                     GrpcEnumFix.fixAccountAsset(rsp);
-                    //bilog(`accountAsset ok, \n\treply=${JSON.stringify(rsp)}`);
+                    bilog(`accountAsset ok, \n\treply=${JSON.stringify(rsp)}`);
+                    this.updateStockData(rsp);
                     this.showAccountAsset(rsp);
                 }
             });
         }
+    }
+
+    // 保存当前显示的持仓的原始数据
+    updateStockData(rsp) {
+        this._.stockList = rsp.stock_positions.map((sp)=>{
+            return Object.assign({},sp);
+        });
+    }
+    // 根据索引下标得到持仓
+    getStockByIdx(idx) {
+        if (this._.stockList) {
+            if (this._.stockList.length>idx) {
+                return this._.stockList[idx];
+            }
+        }
+        bwlog('Cant get stock position data by idx '+idx);
+        return null;
     }
 
     // 展示数据

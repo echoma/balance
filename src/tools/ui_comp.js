@@ -366,6 +366,21 @@ class UIComp {
             LayoutMng.singleton.screen.render();
         });
         btn.popupList.on('select', (obj,idx)=>{
+            btn.updateOnIdx(idx);
+        });
+        // list method
+        btn.selByVal=function(val) {
+            //bilog(`searching for ${val} in ${JSON.stringify(btn.listItems)}`);
+            for (let idx=0; idx<btn.listItems.length; ++idx) {
+                if (btn.listItems[idx].val==val) {
+                    btn.popupList.select(idx);
+                    //bilog(`  select idx ${i} for ${val}`);
+                    btn.updateOnIdx(idx);
+                    return;
+                }
+            }
+        }
+        btn.updateOnIdx=function(idx) {
             btn.selIdx = idx;
             let val = btn.listItems[idx].val;
             let presentStr = btn.listItems[idx].str;
@@ -375,7 +390,7 @@ class UIComp {
             btn.valHolder.setValue(val.toString());
             btn.setContent('> '+presentStr);
             LayoutMng.singleton.screen.render();
-        });
+        }
         return btn;
     }
 
@@ -392,8 +407,8 @@ class UIComp {
         let finalBoxOpt = Object.assign(
             {
                 mouse: false, keys: false, 
-                tags: true, 
-                border: 'line',
+                tags: true,
+                border: boxOptions.label? 'line':undefined,
                 style: this.UIStyleTable,
             }, boxOptions
         );

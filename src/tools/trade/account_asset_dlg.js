@@ -67,7 +67,7 @@ class AccountAssetDlg extends ToolDlg {
         }, {
             top:this._.row_top, left: 0, right: 0,
             height:8,
-            label: 'Stock'
+            //label: 'Stock'
         });
         return dlg;
     }
@@ -215,6 +215,7 @@ class AccountAssetDlg extends ToolDlg {
     }
 }
 
-ToolDlg.registerDialogClass('AccountAssetDlg', AccountAssetDlg);
+// This dialog is deprecated, so I commented it.
+// ToolDlg.registerDialogClass('AccountAssetDlg', AccountAssetDlg);
 
 module.exports = AccountAssetDlg;

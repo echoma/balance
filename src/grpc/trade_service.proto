@@ -5,15 +5,30 @@ import 'trade_data.proto';
 
 service Trade {
     rpc orderNewSingle (OrderNewSingleRequest) returns (Order) {}
+    rpc orderAmendSingle (OrderAmendSingleRequest) returns (Order) {}
+    rpc orderCancelSingle (OrderCancelSingleRequest) returns (Order) {}
     rpc accountAsset (AccountAssetRequest) returns (AccountAsset) {}
+    rpc accountOrderList (AccountOrderListRequest) returns (AccountOrderList) {}
 }
 
 message OrderNewSingleRequest {
     Order order = 1;
-    EnumOpenClose open_close = 2;
+}
+message OrderAmendSingleRequest {
+    Order order = 1;
+    Order old_order = 2;
+}
+message OrderCancelSingleRequest {
+    Order order = 1;
+    Order old_order = 2;
 }
 
 message AccountAssetRequest {
+    EnumMarket market = 1;
+    string account = 2;
+}
+
+message AccountOrderListRequest {
     EnumMarket market = 1;
     string account = 2;
 }

@@ -53,32 +53,43 @@ message Order {
     EnumType type = 9;
     EnumTif tif = 10;
     EnumLongShort long_short = 11;
-    string text = 12;
-    EnumStatus status = 13;
+    EnumOpenClose open_close = 12;
+    string text = 13;
+    EnumStatus status = 14;
+    string filled_quantity = 15;
+    string filled_avg_px = 16;
 }
 
 message CashPosition {
-    EnumMarket market = 1;
-    string currency = 2;
-    EnumLongShort long_short = 3;
-    string balance = 4;
-    string available = 5;
-    string settled = 6;
+    string account = 1;
+    EnumMarket market = 2;
+    string currency = 3;
+    EnumLongShort long_short = 4;
+    string balance = 5;
+    string available = 6;
+    string settled = 7;
 }
 
 message StockPosition {
-    EnumMarket market = 1;
-    string symbol = 2;
-    EnumLongShort long_short = 3;
-    string balance = 4;
-    string available = 5;
-    string settled = 6;
-    string market_value = 7;
+    string account = 1;
+    EnumMarket market = 2;
+    string symbol = 3;
+    EnumLongShort long_short = 4;
+    string balance = 5;
+    string available = 6;
+    string settled = 7;
+    string market_value = 8;
 }
 
 message AccountAsset {
     EnumMarket market = 1;
     string account = 2;
-    repeated CashPosition cash_positions= 3;
+    repeated CashPosition cash_positions = 3;
     repeated StockPosition stock_positions = 4;
+}
+
+message AccountOrderList {
+    EnumMarket market = 1;
+    string account = 2;
+    repeated Order order_list = 3;
 }

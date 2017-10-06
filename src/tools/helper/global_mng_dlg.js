@@ -88,12 +88,12 @@ class GlobalMngDlg extends ToolDlg {
             'Bring Dialog To Front'
         );
         // button: account asset dialog
-        this._.btn_acc_ast = this.createBtn('Acc. Asset', {
+        this._.btn_acc_ast = this.createBtn('Acc. Orders', {
             parent: form, 
             left:2, top:5,
         });
         this._.btn_acc_ast.on('press', ()=>{
-            let cls = ToolDlg.findDialogClassByName('AccountAssetDlg');
+            let cls = ToolDlg.findDialogClassByName('AccountOrderDlg');
             LayoutMng.singleton.add(cls);
         });
         // button: tool list

@@ -146,6 +146,7 @@ class LayoutMng {
         this.dlgList.push(dlg);
         this.screen.render();
         dlg.ui.focus();
+        return dlg;
     }
 
     // Load default layout data and return it

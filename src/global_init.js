@@ -199,4 +199,35 @@ global.map2json=function(mapobj) {
     return j;
 }
 
+
+/**
+ * make abbreviation(缩写) for a string
+ * @param integer max max length of the final abbr
+ * @param ArrayOrInteger wordMax max length of each word in the string
+ */
+String.prototype.abbr=function(max=100, partMax=4) {
+    // 计算每一个单词的最大长度
+    let maxArr = [];
+    partMax = Number.isInteger(partMax)? partMax : 4;
+    for (let i=0; i<100; ++i) {
+        maxArr.push(partMax);
+    }
+    for (let i=0; i<max.length; ++i) {
+        maxArr[i] = partMax[i];
+    }
+    // 开始按词分块
+    let parts = this.split(/[\s\.\-\_]/);
+    if (parts.length==1) {
+        // 如果只有一个单词，则直接返回这个单词的裁剪部分。
+        return parts[0].substr(0,max);
+    }
+    let ret = '';
+    for (let i=0; i<parts.length; ++i) {
+        if (parts[i].length==0)
+            return;
+        ret += (ret.length>0?'.':'') + parts[i].substr(0, maxArr[i]);
+    }
+    return ret.substr(0,max);
+}
+
 module.exports = argv;

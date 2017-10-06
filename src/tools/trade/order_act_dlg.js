@@ -7,13 +7,56 @@ class OrderActDlg extends ToolDlg {
     // Get the category of this tool dialog class.
     static get category() { return ToolDlg.CATEGORY_TRADE; }
     // Get a brief description for this class.
-    static get description() { return 'Input or amend an order.'; }
+    static get description() { return 'Input an order.'; }
     // Get the default title
-    static get defaultTitle() { return 'Order Input/Amend'; }
+    static get defaultTitle() { return 'Order Input'; }
 
     constructor(id, prop={}, layout={}) {
         prop._resizeable='0';
         super(id, prop, layout);
+        this._.mode = 'input';
+    }
+
+    // fill field according to the specified order
+    setOrder(o) {
+        this._.mode = 'amend';
+        this._.order = Object.assign({}, o);
+        this.ui.setLabel(this.title);
+        this._.btn_open.setContent('Amend');
+        this._.btn_close.setContent('Cancel');
+        this._.nm['acc'].input.setValue(o.account);
+        this._.nm['market'].sel.selByVal(o.market);
+        this._.nm['symbol'].input.setValue(o.symbol);
+        this._.nm['quantity'].input.setValue(o.quantity);
+        this._.nm['price'].input.setValue(o.price?o.price:'');
+        this._.nm['stopPrice'].input.setValue(o.stop_price?o.stop_price:'');
+        this._.nm['type'].sel.selByVal(o.type);
+        this._.nm['tif'].sel.selByVal(o.tif);
+        this._.nm['longShort'].sel.selByVal(o.long_short);
+        this._.nm['text'].input.setValue(o.text?o.text:'');
+        this._.nm['id'].input.setValue(o.order_id);
+        this._.nm['clientOrderId'].input.setValue(o.client_order_id);
+        LayoutMng.singleton.screen.render();
+    }
+
+    // fill field according to the specified stock position
+    setStockPosition(sp) {
+        this._.nm['acc'].input.setValue(sp.account);
+        this._.nm['market'].sel.selByVal(sp.market);
+        this._.nm['symbol'].input.setValue(sp.symbol);
+        this._.nm['quantity'].input.setValue(sp.available);
+        this._.nm['longShort'].sel.selByVal(sp.long_short);
+        LayoutMng.singleton.screen.render();
+    }
+
+    // an override
+    get title() {
+        if (this._ 
+            && this._.mode
+            && this._.mode=='amend') {
+            return 'Order Amend/Cancel';
+        }
+        return super.title;
     }
 
     // Create the UI instance
@@ -85,7 +128,7 @@ class OrderActDlg extends ToolDlg {
         // submit button
         this._.btn_open = this.createBtn('Open', {
             parent: form, name: 'open', align:'center',
-            top:this._.row_top, right: 10
+            top:this._.row_top, right: 11
         });
         this._.btn_open.on('press', ()=>{ form.submit(); });
         this._.btn_close = this.createBtn('Close', {
@@ -95,35 +138,76 @@ class OrderActDlg extends ToolDlg {
         this._.btn_close.on('press', ()=>{ form.submit(); });
         // on submit
         form.on('submit', (data)=>{
-            const req = {};
-            req.open_close = data.open? GrpcMng.tradeSvcNs.EnumOpenClose.OPEN : GrpcMng.tradeSvcNs.EnumOpenClose.CLOSE;
-            req.order = {};
-            req.order.account = data.acc;
-            req.order.order_id = data.id;
-            req.order.client_order_id = data.clientOrderId;
-            req.order.market = data.market;
-            req.order.symbol = data.symbol;
-            req.order.quantity = data.quantity;
-            req.order.price = data.price;
-            req.order.stop_price = data.stopPrice;
-            req.order.type = data.type;
-            req.order.tif = data.tif;
-            req.order.long_short = data.longShort;
-            req.order.text = data.text;
-            bilog(`orderNewSignle sending,\n\trequest=${JSON.stringify(req)}`);
-            GrpcMng.tradeClient.orderNewSingle(req, (err, rsp)=>{
-                if (err) {
-                    bwlog(`orderNewSignle failed,\n\terr=${err.toString()}`);
-                    this.showError(err.toString());
+            if (this._.mode == 'input') {
+                const req = {};
+                req.order = {};
+                this.data2Order(req.order, data);
+                req.order.open_close = data.open? GrpcMng.tradeSvcNs.EnumOpenClose.OPEN : GrpcMng.tradeSvcNs.EnumOpenClose.CLOSE;
+                bilog(`orderNewSingle sending,\n\trequest=${JSON.stringify(req)}`);
+                GrpcMng.tradeClient.orderNewSingle(req, (err, rsp)=>{
+                    if (err) {
+                        bwlog(`orderNewSingle failed,\n\terr=${err.toString()}`);
+                        this.showError(err.toString());
+                    } else {
+                        const GrpcEnumFix = require('../../grpc/grpc_enum_fix');
+                        GrpcEnumFix.fixOrder(rsp);
+                        bilog(`orderNewSingle ok, \n\treply=${JSON.stringify(rsp)}`);
+                        this.showMsg('Success!');
+                    }
+                });
+            } else if (this._.mode == 'amend') {
+                const req = {};
+                req.order = {};
+                this.data2Order(req.order, data);
+                req.old_order = this._.order;
+                req.order.open_close = req.old_order.open_close;
+                let isAmend = data.open;
+                if (isAmend) {
+                    bilog(`orderAmendSingle sending,\n\trequest=${JSON.stringify(req)}`);
+                    GrpcMng.tradeClient.orderAmendSingle(req, (err, rsp)=>{
+                        if (err) {
+                            bwlog(`orderAmendSingle failed,\n\terr=${err.toString()}`);
+                            this.showError(err.toString());
+                        } else {
+                            const GrpcEnumFix = require('../../grpc/grpc_enum_fix');
+                            GrpcEnumFix.fixOrder(rsp);
+                            bilog(`orderAmendSingle ok, \n\treply=${JSON.stringify(rsp)}`);
+                            this.showMsg('Success!');
+                        }
+                    });
                 } else {
-                    const GrpcEnumFix = require('../../grpc/grpc_enum_fix');
-                    GrpcEnumFix.fixOrder(rsp);
-                    bilog(`orderNewSignle ok, \n\treply=${JSON.stringify(rsp)}`);
-                    this.showMsg('Success!');
+                    bilog(`orderCancelSingle sending,\n\trequest=${JSON.stringify(req)}`);
+                    GrpcMng.tradeClient.orderCancelSingle(req, (err, rsp)=>{
+                        if (err) {
+                            bwlog(`orderCancelSingle failed,\n\terr=${err.toString()}`);
+                            this.showError(err.toString());
+                        } else {
+                            const GrpcEnumFix = require('../../grpc/grpc_enum_fix');
+                            GrpcEnumFix.fixOrder(rsp);
+                            bilog(`orderCancelSingle ok, \n\treply=${JSON.stringify(rsp)}`);
+                            this.showMsg('Success!');
+                        }
+                    });
                 }
-            });
+            }
         });
         return dlg;
+    }
+
+    // merge form submitting data into an order
+    data2Order(order, data) {
+        order.account = data.acc;
+        order.order_id = data.id;
+        order.client_order_id = data.clientOrderId;
+        order.market = data.market;
+        order.symbol = data.symbol;
+        order.quantity = data.quantity;
+        order.price = data.price;
+        order.stop_price = data.stopPrice;
+        order.type = data.type;
+        order.tif = data.tif;
+        order.long_short = data.longShort;
+        order.text = data.text;
     }
 
     // create a text+input component pair in the specified column.

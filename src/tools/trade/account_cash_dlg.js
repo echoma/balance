@@ -48,8 +48,8 @@ class AccountCashDlg extends ToolDlg {
             ],
         }, {
             top:this._.row_top, left: 0, right: 0,
-            height:6,
-            label: 'Cash'
+            //height:'100%-2',
+            //label: 'Cash'
         });
         return dlg;
     }
@@ -107,7 +107,7 @@ class AccountCashDlg extends ToolDlg {
                 } else {
                     const GrpcEnumFix = require('../../grpc/grpc_enum_fix');
                     GrpcEnumFix.fixAccountAsset(rsp);
-                    //bilog(`accountAsset ok, \n\treply=${JSON.stringify(rsp)}`);
+                    bilog(`accountAsset ok, \n\treply=${JSON.stringify(rsp)}`);
                     this.showAccountAsset(rsp);
                 }
             });

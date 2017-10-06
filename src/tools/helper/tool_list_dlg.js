@@ -40,8 +40,7 @@ class ToolListDlg extends ToolDlg {
         }, {
             top:this._.row_top, left: 0, 
             right: 0, bottom: 0,
-            //height:'100%',
-            label: 'List'
+            //label: 'List'
         });
         this._.row_top += dlgTable.ui.height;
         // generate records
@@ -54,7 +53,6 @@ class ToolListDlg extends ToolDlg {
         // list selection event
         dlgTable.listComp.on('select', (obj,idx)=>{
             let clsName = this._.dlgs[idx][1];
-            bilog(clsName);
             if ('GlobalMngDlg'==clsName) {
                 this.showError('GlobalMngDlg is a singleton. Ctrl-g to display it.');
                 return;
