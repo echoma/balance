@@ -24,7 +24,7 @@ server.addService(tradeSvcNs.Trade.service, {
         console.log(`on orderAmendSingle(${JSON.stringify(call.request)})`);
         if (Math.random()>0.5) {
             console.log('\treturn success');
-            call.request.order.status = tradeSvcNs.Order.EnumStatus.NEW;
+            call.request.order.status = tradeSvcNs.Order.EnumStatus.MATCHING;
             call.request.order.order_id = parseInt(Math.random()*999999).toString();
             callback(null, call.request.order);
         } else {
@@ -36,7 +36,7 @@ server.addService(tradeSvcNs.Trade.service, {
         console.log(`on orderCancelSingle(${JSON.stringify(call.request)})`);
         if (Math.random()>0.5) {
             console.log('\treturn success');
-            call.request.order.status = tradeSvcNs.Order.EnumStatus.NEW;
+            call.request.order.status = tradeSvcNs.Order.EnumStatus.CANCELLED;
             call.request.order.order_id = parseInt(Math.random()*999999).toString();
             callback(null, call.request.order);
         } else {
@@ -54,9 +54,9 @@ server.addService(tradeSvcNs.Trade.service, {
         };
         const tradeDataNs = tradeSvcNs;
         let cashData = [
-            ['ANY','USD','LONG','9284713.00','9284713.00','9284713.00'],
-            ['US','USD','LONG','84713.00','84713.00','84713.00'],
-            ['HK','HKD','LONG','84713.00','84713.00','84713.00'],
+            ['ANY', 'USD', 'LONG', '9284713.00', '9284713.00', '9284713.00'],
+            ['US', 'USD', 'LONG', '84713.00', '84713.00', '84713.00'],
+            ['HK', 'HKD', 'LONG', '84713.00', '84713.00', '84713.00'],
         ];
         cashData.forEach((cash)=>{
             let randChange = parseInt(Math.random()*1000); // 给返回的数值进行随机变动，界面有刷新的效果
@@ -73,13 +73,13 @@ server.addService(tradeSvcNs.Trade.service, {
             asset.cash_positions.push(cashPos);
         });
         let stockData = [
-            ['FX','USD/CNY','LONG','2000','2000','2000','13180'],
-            ['US','RHT','LONG','500','500','500','53150'],
-            ['US','MSFT','LONG','200','100','200','14882'],
-            ['US','BABA','SHORT','100','100','100','17814'],
-            ['HK','700','LONG','500','500','500','173000'],
-            ['HK','3888','LONG','100','0','100','18300'],
-            ['HK','5','LONG','1000','0','100','76200'],
+            ['FX', 'USD/CNY', 'LONG', '2000', '2000', '2000', '13180'],
+            ['US', 'RHT', 'LONG', '500', '500', '500', '53150'],
+            ['US', 'MSFT', 'LONG', '200', '100', '200', '14882'],
+            ['US', 'BABA', 'SHORT', '100', '100', '100', '17814'],
+            ['HK', '700', 'LONG', '500', '500', '500', '173000'],
+            ['HK', '3888', 'LONG', '100', '0', '100', '18300'],
+            ['HK', '5', 'LONG', '1000', '0', '100', '76200'],
         ];
         stockData.forEach((stock)=>{
             let randChange = parseInt(Math.random()*1000); // 给返回的数值进行随机变动，界面有刷新的效果
@@ -108,10 +108,10 @@ server.addService(tradeSvcNs.Trade.service, {
         };
         const tradeDataNs = tradeSvcNs;
         let odrData = [
-            ['HK','700','300','350', '', 'LIMIT', 'DAY', 'LONG', 'OPEN', 'NEW', '0', ''],
-            ['US','BABA','100','150', '', 'LIMIT', 'DAY', 'SHORT', 'OPEN', 'NEW', '0', ''],
-            ['US','MSFT','100','75.9', '75.9', 'STOP_LIMIT', 'DAY', 'LONG', 'CLOSE', 'PARTIAL_FILLED', '50', '76'],
-            ['US','MSFT','100','', '-5', 'TRAIL_STOP_MARKET', 'AT_CROSS', 'LONG', 'CLOSE', 'CANCELLED', '0', '0'],
+            ['HK', '700', '300', '350', '', 'LIMIT', 'DAY', 'LONG', 'OPEN', 'NEW', '0', ''],
+            ['US', 'BABA', '100', '150', '', 'LIMIT', 'DAY', 'SHORT', 'OPEN', 'NEW', '0', ''],
+            ['US', 'MSFT', '100', '75.9', '75.9', 'STOP_LIMIT', 'DAY', 'LONG', 'CLOSE', 'PARTIAL_FILLED', '50', '76'],
+            ['US', 'MSFT', '100', '', '-5', 'TRAIL_STOP_MARKET', 'AT_CROSS', 'LONG', 'CLOSE', 'CANCELLED', '0', '0'],
         ];
         odrData.forEach((odr)=>{
             let odrItem = {

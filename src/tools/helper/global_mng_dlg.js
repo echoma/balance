@@ -24,8 +24,8 @@ class GlobalMngDlg extends ToolDlg {
             LayoutMng.singleton.screen.render();
         });
         LayoutMng.singleton.screen.key('C-f', (ch, key)=>{
-            this._.prompt_save_layout.prompt(
-                'Number of the dialog which you wanna bring to top.',
+            this._.prompt_bring_front.prompt(
+                'ID of the dialog which you wanna bring to top.',
                 '',
                 (ok, val)=>{
                     if (ok) {
@@ -71,7 +71,7 @@ class GlobalMngDlg extends ToolDlg {
         // prompt: where to save
         this._.prompt_save_layout = this.createPrompt(
             LayoutMng.singleton.uiParent,
-            'Save Layout'
+            'Save layout'
         );
         // button: show order act dialog
         this._.btn_order_act = this.createBtn('Order Input', {
@@ -83,9 +83,9 @@ class GlobalMngDlg extends ToolDlg {
             LayoutMng.singleton.add(cls);
         });
         // prompt: bring specified dialog to front
-        this._.prompt_save_layout = this.createPrompt(
+        this._.prompt_bring_front = this.createPrompt(
             LayoutMng.singleton.uiParent,
-            'Bring Dialog To Front'
+            'Bring a dialog to front'
         );
         // button: account asset dialog
         this._.btn_acc_ast = this.createBtn('Acc. Orders', {
