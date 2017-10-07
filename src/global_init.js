@@ -57,31 +57,28 @@ function getLogCaller()
     return lines[3].trim();
 }
 
-let logger = winston;
-if (argv.d) {
-    logger = new (winston.Logger)({
-        transports: [
-            new (winston.transports.File)({
-                filename: argv.d,
-                //maxsize: 10*1024,
-                //maxFiles: 2,
-                handleExceptions: true,
-                humanReadableUnhandledException: true,
-                json: false,
-                formatter: function(options){
-                    let date = new Date();
-                    let txt = `[${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}][${options.level}]: ${options.message ? options.message : ''}`;
-                    if (options.meta && options.meta.stack && Array.isArray(options.meta.stack)) {
-                        options.meta.stack.forEach((s)=>{
-                            txt += '\n  '+s;
-                        });
-                    }
-                    return txt;
+const logger = new (winston.Logger)({
+    transports: [
+        new (winston.transports.File)({
+            filename: argv.d && 'string'==typeof(argv.d) ? argv.d : '/dev/null',
+            //maxsize: 10*1024,
+            //maxFiles: 2,
+            handleExceptions: true,
+            humanReadableUnhandledException: true,
+            json: false,
+            formatter: function(options){
+                let date = new Date();
+                let txt = `[${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}][${options.level}]: ${options.message ? options.message : ''}`;
+                if (options.meta && options.meta.stack && Array.isArray(options.meta.stack)) {
+                    options.meta.stack.forEach((s)=>{
+                        txt += '\n  '+s;
+                    });
                 }
-            })
-        ]
-    });
-}
+                return txt;
+            }
+        })
+    ]
+});
 logger.exitOnError = true;
 setTimeout(()=>{
     logger.exitOnError = false;

@@ -31,6 +31,8 @@ balance的目标用户是使用linux的交易系统开发者、算法交易者�
 
 -t: 使用指定的颜色主题。默认是黑色主题，其他的有：white、blue、green、yellow。
 
+例如：`node ./ -s 'localhost:9527' -l ./layout/example.layout -t yellow -d ./test.log`
+
 ## 快捷键
 
 Esc: 关闭当前窗口
