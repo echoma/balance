@@ -1,0 +1,93 @@
+{
+    // 这是一份全量配置，其他配置都是覆盖这份配置
+    // 颜色关键字列表
+    "colorKey": {
+        // 前景色、背景色
+        "fore": "black",
+        "back": "white",
+        // 按钮焦点状态的前景色、背景色
+        "focus": {
+            "fore": "white",
+            "back": "red"
+        },
+        // 列表条目被选中时的前景色、背景色
+        "selected": {
+            "fore": "black",
+            "back": "cyan"
+        },
+        // 安全与危险的颜色
+        "safe": "green",
+        "danger": "red"
+    },
+    // 对组件的颜色进行定义
+    "colorComp": {
+        // 取值里使用"$"来引用colorKey里的名字，
+        // 普通组件的前景色、背景色、边框颜色。任何组件，如果没有定义自己的特别颜色，将使用这里的颜色
+        "common": {
+            "fore": "$fore",
+            "back": "$back",
+            "border": {
+                "fore": "$back",
+                "back": "$fore"
+            }
+        },
+        // 窗口
+        "window": {},
+        // 按钮类组件
+        "button": {
+            "fore": "$back",
+            "back": "$fore",
+            "focus": "$focus"
+        },
+        // 输入框类组件
+        "input": {
+            "fore": "$back",
+            "back": "$fore",
+            "focus": "$focus"
+        },
+        // 普通弹出消息的文本
+        "msg": {
+            "fore": "white",
+            "back": "$safe"
+        },
+        // 错误或告警弹出消息的文本
+        "error": {
+            "fore": "white",
+            "back": "$danger"
+        },
+        // comboBox
+        "comboBox": {
+            "button": {
+                "fore": "$selected.fore",
+                "back": "$selected.back",
+                "focus": "$focus"
+            },
+            "listItem": {
+                "item": {
+                    "fore": "white",
+                    "back": "black"
+                },
+                "selected": {
+                    "fore": "$selected.fore",
+                    "back": "$selected.back",
+                    "bold": true
+                }
+            }
+        },
+        // 表格
+        "table": {
+            "header": {
+                "fore": "$fore",
+                "back": "$back",
+                "bold": true
+            },
+            "item": {
+                "selected": "$selected"
+            },
+            "scrollbar": {
+                "fore": "$back",
+                "back": "$fore"
+            }
+        }
+    }
+}

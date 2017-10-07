@@ -1,5 +1,6 @@
 const blessed = require('blessed');
 const contrib = require('blessed-contrib');
+const Theme = require('../theme/theme')
 
 // Any UI component should extend this class
 class UIComp {
@@ -23,111 +24,6 @@ class UIComp {
     // Append this dialog to the specified UI container
     appendTo(container) { container.append(this.ui); }
 
-    // Get the UI style of this dialog
-    get UIStyleWindow() {
-        return {
-            fg: 'black', bg: 'blue',
-            border: { fg: 'blue' },
-            hover: { bg: 'green' }
-        };
-    }
-    // Get the UI style of buttons in this dialog
-    get UIStyleBtn() {
-        return {
-            fg: 'white', bg: 'black',
-            border: { fg: 'white' },
-            focus: { fg: 'white', bg: 'red' },
-        }
-    }
-    // Get the UI Style of single line text input
-    get UIStyleInput() {
-        return {
-            fg: 'white', bg: 'black',
-        }
-    }
-    // Get the UI Style of single line of static text
-    get UIStyleStaticText() {
-        return {
-            fg: 'black',
-            bg: 'blue'
-        }
-    }
-    // Get the UI Style of message text
-    static get UIStyleMsg() {
-        return {
-            fg: 'red',
-            bg: 'green',
-            border: { fg: 'white' },
-        }
-    }
-    // Get the UI Style of error text
-    static get UIStyleError() {
-        return {
-            fg: 'green',
-            bg: 'red',
-            border: { fg: 'white' },
-        }
-    }
-    // Get the UI style of radio button
-    get UIStyleRadio() {
-        return {
-            fg: 'black', bg: 'blue',
-            border: { fg: 'white' },
-            focus: { fg: 'white', bg: 'red' },
-        }
-    }
-    // Get the UI style of a set of radio buttons
-    get UIStyleRadioSet() {
-        return {
-            fg: 'white', bg: 'blue',
-            border: { fg: 'white', bg: 'blue' }
-        }
-    }
-    // Get the UI style title tags of radio-set
-    UiStyleRadioSetTitle(title) {
-        return `{black-fg,blue-bg}${title}{/black-fg,blue-bg}`
-    }
-    // Get the UI style of selection button
-    get UIStyleSelectBtn() {
-        return {
-            fg: 'black', bg: 'cyan',
-            border: { fg: 'white' },
-            focus: { fg: 'white', bg: 'red' },
-        }
-    }
-    // Get the UI style of selection list
-    get UIStyleSelectList() {
-        return {
-            fg: 'white', bg: 'black',
-            border: { fg: 'white' },
-            focus: { fg: 'white', bg: 'red' },
-            item: {fg: 'white', bg: 'black'},
-            selected: {fg: 'black', bg: 'cyan', bold: true}
-        }
-    }
-    // Get the UI style of tables
-    get UIStyleTable() {
-        return {
-            fg: 'black', bg: 'blue',
-            bold: true,
-            border: { type: 'line', fg: 'black', bg: 'blue'},
-        }
-    }
-    // Get the UI style title tags of table
-    UiStyleTableTitle(title) {
-        return `{black-fg,blue-bg,bold}${title}{/black-fg,blue-bg,bold}`
-    }
-    // Get the UI style of records list in the tables
-    get UIStyleTableRecords() {
-        return {
-            fg: 'black', bg: 'blue',
-            focus: { fg: 'white', bg: 'blue' },
-            item: {fg: 'black', bg: 'blue'},
-            selected: {fg: 'black', bg: 'cyan'},
-            scrollbar: {fg: 'white', bg: 'black'}
-        }
-    }
-
     /**
      * Create a window which has a form inside.
      * @param {String} txt the title of this window.
@@ -139,13 +35,13 @@ class UIComp {
             label: title, border:'line',
             keys: true, mouse: true,
             draggable: true, 
-            style: this.UIStyleWindow
+            style: Theme.singleton.styleWindow
         }, attr);
         let box = blessed.box(winAttr);
         let formAttr = Object.assign({
             keys: true, mouse: true,
             draggable: true, 
-            style: this.UIStyleWindow
+            style: Theme.singleton.styleWindow
         }, attr, {
             parent: box,
             left: 0, top: 0,
@@ -160,7 +56,7 @@ class UIComp {
             label: title, border:'line',
             keys: true, mouse: true,
             draggable: true, 
-            style: this.UIStyleWindow
+            style: Theme.singleton.styleWindow
         }, attr);
         let box = blessed.form(finalAttr);
         box.insideForm = box;
@@ -174,7 +70,7 @@ class UIComp {
             label: title, border:'line',
             keys: true, mouse: true,
             draggable: true, 
-            style: this.UIStyleWindow
+            style: Theme.singleton.styleWindow
         }, attr);
         return blessed.box(finalAttr);
     }
@@ -190,7 +86,7 @@ class UIComp {
             mouse: true, keys: true,
             shrink: true, name: txt.toLowerCase(),
             padding: {left:1, right:1},
-            style: this.UIStyleBtn
+            style: Theme.singleton.styleBtn
         }, attr);
         return blessed.button(finalAttr);
     }
@@ -205,7 +101,7 @@ class UIComp {
             value: txt, //mouse: true,
             keys: true, //vi: true,
             inputOnFocus: true,
-            style: this.UIStyleInput
+            style: Theme.singleton.styleInput
         }, attr);
         return blessed.textbox(finalAttr);
     }
@@ -217,7 +113,7 @@ class UIComp {
     createStaticText(txt, attr={}) {
         let finalAttr = Object.assign({
             content: txt, shrink:true,
-            style: this.UIStyleStaticText
+            style: Theme.singleton.styleStaticText
         }, attr);
         return blessed.text(finalAttr);
     }
@@ -234,7 +130,7 @@ class UIComp {
             left: 'center', top: 3,
             shrink: true, border: 'line',
             padding: {left:2, right:2},
-            style: UIComp.UIStyleMsg,
+            style: Theme.singleton.styleMsg,
             parent: LayoutMng.singleton.uiParent
         }, attr);
         let msgbox = new blessed.message(finalAttr);
@@ -249,7 +145,7 @@ class UIComp {
             left: 'center', top: 3,
             shrink: true, border: 'line',
             padding: {left:2, right:2},
-            style: UIComp.UIStyleError,
+            style: Theme.singleton.styleError,
             parent: LayoutMng.singleton.uiParent
         }, attr);
         let msgbox = new blessed.message(finalAttr);
@@ -265,16 +161,16 @@ class UIComp {
             mouse: true, keys: true,
             shrink: true, 
             padding: {left:1, right:1},
-            style: this.UIStyleRadio
+            style: Theme.singleton.styleRadio
         }, attr);
         return blessed.radiobutton(finalAttr);
     }
     createRadioSet(title, attr={}) {
         let finalAttr = Object.assign({
-            label: this.UiStyleRadioSetTitle(title), border:'line',
+            label: Theme.singleton.styleRadioSetTitle(title), border:'line',
             keys: true, mouse: true,
             shrink: true, tags: true,
-            style: this.UIStyleRadioSet
+            style: Theme.singleton.styleRadioSet
         }, attr);
         return blessed.radioset(finalAttr);
     }
@@ -309,7 +205,7 @@ class UIComp {
             mouse: true, keys: true,
             shrink: true, height: 1,
             padding: {left:1, right:1},
-            style: this.UIStyleSelectBtn
+            style: Theme.singleton.styleSelectBtn
         }, buttonAttr);
         let btn = blessed.button(finalBtnAttr);
         // create a hidden input to hold the value this selection component
@@ -337,7 +233,7 @@ class UIComp {
             height: popupListHeight,
             shrink: true, hidden:true,
             border: 'line',
-            style: this.UIStyleSelectList,
+            style: Theme.singleton.styleSelectList,
         }, listAttr, {
             parent: LayoutMng.singleton.uiParent
         });
@@ -403,13 +299,13 @@ class UIComp {
     createTable(tableOptions, boxOptions=null, listOptions=null) {
         //box options
         if (!isEmpty(boxOptions.label))
-            boxOptions.label = this.UiStyleTableTitle(boxOptions.label);
+            boxOptions.label = Theme.singleton.styleTableTitle(boxOptions.label);
         let finalBoxOpt = Object.assign(
             {
                 mouse: false, keys: false, 
                 tags: true,
                 border: boxOptions.label? 'line':undefined,
-                style: this.UIStyleTable,
+                style: Theme.singleton.styleTable,
             }, boxOptions
         );
         // list options
@@ -417,7 +313,7 @@ class UIComp {
             {
                 mouse: true, keys: true, 
                 tags: false, 
-                style: this.UIStyleTableRecords,
+                style: Theme.singleton.styleTableRecords,
             }, listOptions
         );
         // create table
@@ -435,7 +331,7 @@ class UIComp {
                 border: 'line',
                 top: 4, left: 'center',
                 width: 30, height: 7,
-                //style: this.UIStyleWindow,
+                //style: Theme.singleton.styleWindow,
             }, attr
         );
         return new BalEnsure(title, finalAttr);

@@ -12,10 +12,14 @@ Options:
     -l: load this layout data file. Default layout will be used if not speicified.
     -d: debug log file path name.
     -s: backend RPC server host, default is localhost:9527.
+    -t: use a specified theme (default is black, available: blue, white, green, yellow)
 
 Shortcuts:
+    Esc: close current dialog.
+    Tab/Up/Down: Traverse in the components of current dialog.
     Ctrl+g: bring the 'Global Management Dialog' to front.
     Ctrl+f: bring the dialog with the specified id to the front.
+    Ctrl+r: show the property editor of current dialog.
     `;
     console.log(help);
     process.exit(0);
@@ -53,28 +57,31 @@ function getLogCaller()
     return lines[3].trim();
 }
 
-const logger = new (winston.Logger)({
-    transports: [
-        new (winston.transports.File)({
-            filename: argv.d? argv.d : '/dev/null',
-            //maxsize: 10*1024,
-            //maxFiles: 2,
-            handleExceptions: true,
-            humanReadableUnhandledException: true,
-            json: false,
-            formatter: function(options){
-                let date = new Date();
-                let txt = `[${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}][${options.level}]: ${options.message ? options.message : ''}`;
-                if (options.meta && options.meta.stack && Array.isArray(options.meta.stack)) {
-                    options.meta.stack.forEach((s)=>{
-                        txt += '\n  '+s;
-                    });
+let logger = winston;
+if (argv.d) {
+    logger = new (winston.Logger)({
+        transports: [
+            new (winston.transports.File)({
+                filename: argv.d,
+                //maxsize: 10*1024,
+                //maxFiles: 2,
+                handleExceptions: true,
+                humanReadableUnhandledException: true,
+                json: false,
+                formatter: function(options){
+                    let date = new Date();
+                    let txt = `[${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}][${options.level}]: ${options.message ? options.message : ''}`;
+                    if (options.meta && options.meta.stack && Array.isArray(options.meta.stack)) {
+                        options.meta.stack.forEach((s)=>{
+                            txt += '\n  '+s;
+                        });
+                    }
+                    return txt;
                 }
-                return txt;
-            }
-        })
-    ]
-});
+            })
+        ]
+    });
+}
 logger.exitOnError = true;
 setTimeout(()=>{
     logger.exitOnError = false;

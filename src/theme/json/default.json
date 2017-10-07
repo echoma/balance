@@ -1,0 +1,16 @@
+{
+    // 颜色关键字列表
+    "colorKey": {
+        // 前景色、背景色
+        "fore": "white",
+        "back": "black"
+    },
+    "colorComp": {
+        "common": {
+            "border": {
+                "fore": "$fore",
+                "back": "$back"
+            }
+        }
+    }
+}

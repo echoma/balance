@@ -12,7 +12,7 @@ nodejs做的简单适配层。
 
 ## python
 
-python2做的简单适配层。
+python做的简单适配层。（python2\3都可以）
 
 运行前，需要安装`grpcio`这个模块。（可使用命令`pip install grpcio`进行安装）
 
