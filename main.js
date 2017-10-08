@@ -1,4 +1,3 @@
-'use strict';
 const argv = require('./global_init');
 
 // initialize text UI
