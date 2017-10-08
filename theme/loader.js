@@ -6,14 +6,14 @@ class Loader {
     }
 
     // 加载主题文件并进行解析
-    load(name='default') {
+    load(name) {
         // load json from file
         const fs = require('fs');
-        let con = fs.readFileSync(`./theme/json/${name}.json`, 'utf-8');
+        let con = fs.readFileSync(`${__dirname}/json/${name}.json`, 'utf-8');
         con = con.replace(/\/\/.*/g, '');
         con = JSON.parse(con);
         // load complete settings as merge source
-        let dfCon = fs.readFileSync(`./theme/json/complete__.json`, 'utf-8');
+        let dfCon = fs.readFileSync(`${__dirname}/json/complete__.json`, 'utf-8');
         dfCon = dfCon.replace(/\/\/.*/g, '');
         dfCon = JSON.parse(dfCon);
         const deepExtend = require('deep-extend')

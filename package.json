@@ -1,6 +1,6 @@
 {
   "name": "balance-ui",
-  "version": "0.1.2",
+  "version": "0.1.0",
   "description": "a command line frontend for stock trading",
   "author": "https://github.com/echoma/",
   "main": "main.js",

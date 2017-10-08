@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-
 const argv = require('./global_init');
 
 // initialize text UI
@@ -12,7 +11,7 @@ let screen = blessed.screen({
     //them
 const Theme = require('./theme/theme');
 const theme = new Theme();
-const themeName = argv.t && 'string'==typeof(argv.t)? argv.t : 'default';
+const themeName = argv.t && 'string'==typeof(argv.t)? argv.t : 'black';
 theme.init(themeName);
     //layout
 const LayoutMng = require('./layout/layout_mng');
