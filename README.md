@@ -1,5 +1,7 @@
 # balance
 
+[![Build Status](https://travis-ci.org/echoma/balance.svg?branch=master)](https://travis-ci.org/echoma/balance)
+
 命令行下的证券交易前端。文本交互界面基于[blessed](https://github.com/chjj/blessed)技术。
 
 ![order_act.png](https://media.githubusercontent.com/media/echoma/lfs/master/balance/img/order_act.png)
