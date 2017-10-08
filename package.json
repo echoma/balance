@@ -1,17 +1,23 @@
 {
-  "name": "balance",
-  "version": "1.0.0",
-  "description": "a command line frontend for security trading",
+  "name": "balance-ui",
+  "version": "0.1.1",
+  "description": "a command line frontend for stock trading",
   "author": "https://github.com/echoma/",
   "main": "main.js",
   "scripts": {
     "test": "node ./ --test -l ./layout/example.layout"
+  },
+  "bin": {
+    "balance-ui": "main.js"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/echoma/balance.git"
   },
   "license": "Apache License 2.0",
+  "engines": {
+    "node": ">=6"
+  },
   "dependencies": {
     "blessed": "^0.1.81",
     "blessed-contrib": "^4.8.5",
