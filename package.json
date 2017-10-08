@@ -2,8 +2,11 @@
   "name": "balance",
   "version": "1.0.0",
   "description": "a command line frontend for security trading",
-  "author": "fatmck@163.com",
+  "author": "https://github.com/echoma/",
   "main": "main.js",
+  "scripts": {
+    "test": "node ./ --test -l ./layout/example.layout"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/echoma/balance.git"

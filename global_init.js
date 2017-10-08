@@ -31,6 +31,7 @@ Shortcuts:
  *      bwlog: level warning
  */
 const winston = require('winston');
+let logger = winston;
 
 // register our own log function
 global.bilog=function(){
@@ -57,32 +58,38 @@ function getLogCaller()
     return lines[3].trim();
 }
 
-const logger = new (winston.Logger)({
-    transports: [
-        new (winston.transports.File)({
-            filename: argv.d && 'string'==typeof(argv.d) ? argv.d : '/dev/null',
-            //maxsize: 10*1024,
-            //maxFiles: 2,
-            handleExceptions: true,
-            humanReadableUnhandledException: true,
-            json: false,
-            formatter: function(options){
-                let date = new Date();
-                let txt = `[${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}][${options.level}]: ${options.message ? options.message : ''}`;
-                if (options.meta && options.meta.stack && Array.isArray(options.meta.stack)) {
-                    options.meta.stack.forEach((s)=>{
-                        txt += '\n  '+s;
-                    });
+if (argv.test) {
+    setTimeout(()=>{
+        process.exit(0);
+    }, 3000);
+} else {
+    const logger = new (winston.Logger)({
+        transports: [
+            new (winston.transports.File)({
+                filename: argv.d && 'string'==typeof(argv.d) ? argv.d : '/dev/null',
+                //maxsize: 10*1024,
+                //maxFiles: 2,
+                handleExceptions: true,
+                humanReadableUnhandledException: true,
+                json: false,
+                formatter: function(options){
+                    let date = new Date();
+                    let txt = `[${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}][${options.level}]: ${options.message ? options.message : ''}`;
+                    if (options.meta && options.meta.stack && Array.isArray(options.meta.stack)) {
+                        options.meta.stack.forEach((s)=>{
+                            txt += '\n  '+s;
+                        });
+                    }
+                    return txt;
                 }
-                return txt;
-            }
-        })
-    ]
-});
-logger.exitOnError = true;
-setTimeout(()=>{
-    logger.exitOnError = false;
-}, 3000);
+            })
+        ]
+    });
+    logger.exitOnError = true;
+    setTimeout(()=>{
+        logger.exitOnError = false;
+    }, 3000);
+}
 bilog(`
 **************************
 *       BLANCE 0.1       *
