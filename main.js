@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const argv = require('./global_init');
 
 // initialize text UI
